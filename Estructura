@@ -1,0 +1,21 @@
+MEA-Core-IA/
+│
+├── core/                # Núcleo de la IA (scripts principales)
+│   └── engine.py
+│
+├── bots/                # Integraciones opcionales (Telegram, Discord, CLI)
+│   ├── telegram_bot.py
+│   └── discord_bot.py
+│
+├── data/                # Datos locales, configuraciones o modelos mini
+│   └── config.json
+│
+├── tools/               # Utilidades externas o módulos complementarios
+│   └── mac_changer.py
+│
+├── docs/                # Documentación técnica y roadmap
+│   └── ROADMAP.md
+│
+├── README.md
+├── .gitignore
+└── requirements.txt     # Dependencias mínimas
