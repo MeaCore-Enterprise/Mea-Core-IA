@@ -17,5 +17,5 @@ MEA-Core-IA/
 │   └── ROADMAP.md
 │
 ├── README.md
-├── .gitignore
+├── .gitignore y .gitattributes
 └── requirements.txt     # Dependencias mínimas
