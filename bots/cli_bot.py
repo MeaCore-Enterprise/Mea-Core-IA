@@ -1,96 +1,129 @@
+import sys
+import os
+import json
+from typing import Any, List, Dict
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-from core.personality import load_personality
 from core.memory import MemoryStore
 from core.ethics import EthicsCore
-from core.curiosity import CuriosityModule
-from typing import Any, List
-import random
+from core.brain import Brain
+from core.remote_logger import RemoteLogger
+from core.swarm import SwarmController
+from core.settings_manager import SettingsManager
 
+class CliBot:
+    def __init__(self) -> None:
+        self.settings_manager = SettingsManager()
+        self.responses = self._load_responses()
+        self.mem: MemoryStore = MemoryStore()
+        self.ethics: EthicsCore = EthicsCore()
+        self.brain: Brain = Brain(self.settings_manager.settings, self.responses)
+        self.remote_logger: RemoteLogger = RemoteLogger(self.settings_manager.settings)
+        self.swarm_controller: SwarmController = SwarmController(self.settings_manager.settings, self.mem)
+        self.context: List[str] = []
+        self.is_running: bool = True
 
-
-def main_loop() -> None:
-    persona: dict[str, Any] = load_personality()
-    mem: MemoryStore = MemoryStore()
-    ethics = EthicsCore()
-    curiosity = CuriosityModule()
-    context: List[str] = []  # Guarda las últimas 5 interacciones
-    saludos = [
-        "¡Hola! ¿Cómo estás?",
-        "¡Buen día! ¿En qué puedo ayudarte?",
-        "¡Saludos! ¿Qué te gustaría saber hoy?"
-    ]
-    despedidas = [
-        "¡Hasta luego!",
-        "Adiós, que tengas un gran día.",
-        "Nos vemos pronto."
-    ]
-    plantillas = [
-        "Interesante lo que mencionas sobre '{input}'.",
-        "Nunca había pensado en '{input}', cuéntame más.",
-        "¿Por qué te interesa '{input}'?",
-        "Eso suena importante: '{input}'."
-    ]
-    print(persona.get("greeting", random.choice(saludos)))
-    while True:
+    def _load_responses(self) -> Dict[str, Any]:
         try:
-            q: str = input("> ").strip()
-            if not q:
-                continue
-            if q.lower() in {"exit", "quit"}:
-                print(random.choice(despedidas))
+            with open("config/responses.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            print("[ERROR] Archivo config/responses.json no encontrado.")
+            return {}
+
+    def _show_settings_menu(self):
+        while True:
+            remote_enabled = self.remote_logger.enabled
+            swarm_enabled = self.swarm_controller.replication_enabled
+            print("\n--- Submenú de Configuración ---")
+            print(f"1. Aprendizaje Remoto      : {'ACTIVADO' if remote_enabled else 'DESACTIVADO'}")
+            print(f"2. Replicación en Enjambre : {'ACTIVADA' if swarm_enabled else 'DESACTIVADA'}")
+            print("Escribe '1' o '2' para cambiar la opción, o 'salir' para volver.")
+            choice = input("Opción >> ").strip().lower()
+            if choice == '1':
+                new_status = not remote_enabled
+                self.settings_manager.set_value('remote_learning.enabled', new_status)
+                self.remote_logger.enabled = new_status
+                print(f"El Aprendizaje Remoto ha sido {'ACTIVADO' if new_status else 'DESACTIVADO'}.")
+            elif choice == '2':
+                new_status = not swarm_enabled
+                self.settings_manager.set_value('swarm.replication_enabled', new_status)
+                self.swarm_controller.replication_enabled = new_status
+                print(f"La Replicación en Enjambre ha sido {'ACTIVADA' if new_status else 'DESACTIVADA'}.")
+            elif choice in ['salir', 'exit', 'quit']:
+                print("Volviendo a la conversación...")
                 break
-            # comandos básicos para debug
-            if q.startswith("!set "):
-                _, key, *rest = q.split()
-                val = " ".join(rest)
-                mem.set(key, val)
-                print(f"[mem] {key} = {val}")
-                continue
-            if q.startswith("!get "):
-                _, key = q.split()
-                print(mem.get(key))
-                continue
-
-            # Ética: verifica si la acción es permitida
-            if not ethics.check_action(q):
-                print(f"[Ética] {ethics.explain_decision(q)}")
-                continue
-
-            # Aprendizaje: guarda cada mensaje y su respuesta asociada
-            respuesta = mem.get(f"aprendido:{q}")
-            if respuesta:
-                print(f"[{persona.get('name')}] (aprendido) → {respuesta}")
             else:
-                # Curiosidad: recompensa por preguntas nuevas
-                reward = curiosity.intrinsic_reward(q)
-                if reward > 0.5:
-                    print(f"[Curiosidad] ¡Gracias por una pregunta interesante!")
+                print("Opción no válida.")
 
-                # Motor de respuesta con contexto y variaciones
-                # Usa contexto para respuestas más naturales
-                contexto = " | ".join(context[-3:]) if context else ""
-                if contexto:
-                    plantilla = random.choice(plantillas)
-                    respuesta_auto = plantilla.format(input=q) + f" (Contexto: {contexto})"
-                else:
-                    respuesta_auto = random.choice(plantillas).format(input=q)
-                print(f"[{persona.get('name')}] → {respuesta_auto}")
+    def handle_command(self, q: str) -> bool:
+        q_lower = q.lower()
+        if q_lower == "!settings":
+            self._show_settings_menu()
+            return True
+        if q.startswith("!set "):
+            try:
+                _, key, *rest = q.split()
+                self.mem.set(key, " ".join(rest))
+                print(f"[Memoria] {key} = {" ".join(rest)}")
+            except ValueError:
+                print("[Error] Comando !set mal formado.")
+            return True
+        if q.startswith("!get "):
+            try:
+                _, key = q.split()
+                print(f"[Memoria] {key} -> {self.mem.get(key) or 'No encontrado'}")
+            except ValueError:
+                print("[Error] Comando !get mal formado.")
+            return True
+        if q_lower == "!dump":
+            print("[Memoria] Dump completo:", self.mem.dump_all())
+            return True
+        return False
 
-                # Pregunta al usuario cómo debería responder la próxima vez
-                nueva = input(f"¿Cómo debería responder a '{q}' en el futuro? (deja vacío para no aprender): ").strip()
-                if nueva:
-                    mem.set(f"aprendido:{q}", nueva)
-                    print(f"[Aprendizaje] ¡He aprendido a responder '{q}'!")
+    def setup(self) -> None:
+        instance_id = self.mem.get_instance_id()
+        print(f"--- Iniciando Mea-Core (ID: {instance_id[:8]}) ---")
+        if self.remote_logger.enabled:
+            print("[INFO] Aprendizaje remoto: ACTIVADO")
+        else:
+            print("[INFO] Aprendizaje remoto: DESACTIVADO")
+        if self.swarm_controller.replication_enabled:
+            print("[INFO] Replicación de enjambre: ACTIVADA")
+        else:
+            print("[INFO] Replicación de enjambre: DESACTIVADA")
+        print(f"--- {self.brain.get_greeting()} ---")
 
-            # Actualiza el contexto
-            context.append(q)
-            if len(context) > 5:
-                context.pop(0)
-        except KeyboardInterrupt:
-            print("\nInterrumpido. Saliendo.")
-            break
+    def process_input(self, q: str) -> None:
+        if self.handle_command(q):
+            return
+        if not self.ethics.check_action(q):
+            print(f"[Ética] {self.ethics.explain_decision(q)}")
+            return
+        respuestas = self.brain.get_response(q)
+        for respuesta in respuestas:
+            print(respuesta)
+        self.mem.log_conversation(user_input=q, bot_output=respuestas)
+        self.remote_logger.log(user_input=q, bot_output=respuestas)
+        self.context.append(q)
+
+    def run(self) -> None:
+        self.setup()
+        while self.is_running:
+            try:
+                self.swarm_controller.run_replication_cycle()
+                q = input(">> ").strip()
+                if q.lower() in {"exit", "quit", "salir"}:
+                    print(self.brain.get_farewell())
+                    self.is_running = False
+                    continue
+                if q:
+                    self.process_input(q)
+            except (EOFError, KeyboardInterrupt):
+                print(f"\n{self.brain.get_farewell()}")
+                self.is_running = False
 
 if __name__ == "__main__":
-    main_loop()
+    bot = CliBot()
+    bot.run()

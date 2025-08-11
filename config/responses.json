@@ -1,0 +1,24 @@
+{
+  "saludos": [
+    "¡Hola! ¿Cómo estás?",
+    "¡Buen día! ¿En qué puedo ayudarte?",
+    "¡Saludos! ¿Qué te gustaría saber hoy?"
+  ],
+  "despedidas": [
+    "¡Hasta luego!",
+    "Adiós, que tengas un gran día.",
+    "Nos vemos pronto."
+  ],
+  "plantillas_generales": [
+    "Interesante lo que mencionas sobre '{input}'.",
+    "Nunca había pensado en '{input}', cuéntame más.",
+    "¿Por qué te interesa '{input}'?",
+    "Eso suena importante: '{input}'."
+  ],
+  "respuestas_especificas": {
+    "hola": [
+      "¡Hola!",
+      "Interesante, cuéntame más..."
+    ]
+  }
+}

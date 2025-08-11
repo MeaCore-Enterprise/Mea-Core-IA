@@ -1,0 +1,7 @@
+discord.py
+python-telegram-bot
+pytest
+scikit-learn
+fastapi
+uvicorn[standard]
+requests

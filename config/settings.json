@@ -1,0 +1,13 @@
+{
+  "brain": {
+    "mode": "rule"
+  },
+  "remote_learning": {
+    "enabled": true,
+    "server_url": "http://127.0.0.1:8000/api/learn"
+  },
+  "swarm": {
+    "replication_enabled": false,
+    "scan_interval_seconds": 300
+  }
+}

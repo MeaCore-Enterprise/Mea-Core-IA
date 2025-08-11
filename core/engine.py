@@ -26,20 +26,20 @@ class MEAEngine:
 
     def saludar(self) -> None:
         nombre: str = str(self.config.get("nombre", "Usuario"))
-        print(f"👋 ¡Hola, {nombre}! Soy MEA-Core IA.")
+        print(f"¡Hola, {nombre}! Soy MEA-Core IA.")
 
     def mostrar_ayuda(self) -> None:
-        print("🧠 Comandos disponibles:")
+        print("Comandos disponibles:")
         for comando in self.commands:
             print(f" - {comando}")
 
     def salir(self) -> None:
-        print("👋 Cerrando MEA-Core IA. ¡Hasta luego!")
+        print("Cerrando MEA-Core IA. ¡Hasta luego!")
         exit()
 
 
     def ejecutar(self) -> None:
-        print("📦 Cargando MEA-Core IA...")
+        print("Cargando MEA-Core IA...")
         self.cargar_config()
 
         while True:
@@ -47,7 +47,7 @@ class MEAEngine:
             if entrada in self.commands:
                 self.commands[entrada]()
             else:
-                print("❌ Comando no reconocido. Escribe 'ayuda' para ver opciones.")
+                print("Comando no reconocido. Escribe 'ayuda' para ver opciones.")
 
 if __name__ == "__main__":
     motor = MEAEngine()
