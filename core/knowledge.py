@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Dict, Any
 
 # Intentar importar rank_bm25, si no, se lanzará un error en el constructor
 try:
@@ -9,8 +9,6 @@ try:
     RANK_BM25_AVAILABLE = True
 except ImportError:
     RANK_BM25_AVAILABLE = False
-
-DB_PATH = "data/knowledge_base.db"
 
 # Lista simple de stopwords en español para mejorar la calidad de la búsqueda
 SPANISH_STOPWORDS = set([
@@ -31,9 +29,14 @@ class KnowledgeBase:
     """
     Gestiona la base de datos de conocimiento y proporciona búsqueda semántica.
     """
-    def __init__(self, path: str = DB_PATH):
+    def __init__(self, settings: Optional[Dict[str, Any]] = None):
         if not RANK_BM25_AVAILABLE:
             raise ImportError("La librería 'rank-bm25' no está instalada. Por favor, ejecute 'pip install rank-bm25'")
+
+        if settings:
+            path = settings.get("database", {}).get("knowledge_db_path", "data/knowledge_base.db")
+        else:
+            path = "data/knowledge_base.db"
 
         if path != ":memory:":
             os.makedirs(os.path.dirname(path), exist_ok=True)

@@ -7,10 +7,15 @@ import uuid
 import json
 from typing import Optional, Dict, List, Any
 
-DB_PATH: str = "data/mea_memory.db"
+from core.settings_manager import SettingsManager
 
 class MemoryStore:
-    def __init__(self, path: str = DB_PATH) -> None:
+    def __init__(self, settings_manager: Optional[SettingsManager] = None) -> None:
+        if settings_manager:
+            path = settings_manager.get_setting("database.memory_db_path", "data/mea_memory.db")
+        else:
+            path = "data/mea_memory.db"
+        
         if path != ":memory:":
             os.makedirs(os.path.dirname(path), exist_ok=True)
         self.conn: sqlite3.Connection = sqlite3.connect(path, check_same_thread=False)

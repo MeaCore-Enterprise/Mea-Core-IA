@@ -1,10 +1,12 @@
-
 import json
 import os
 import random
 from typing import Any, Dict, List, Optional
 
 from core.knowledge import KnowledgeBase
+from core.evolution import ActiveLearningModule
+from core.goals import GoalManager
+from core.memory import MemoryStore
 
 # Intentar importar scikit-learn y manejar el fallo si no está instalado
 try:
@@ -31,12 +33,22 @@ class BotAction(Fact):
     """Hecho que representa una acción que el bot debe tomar."""
     pass
 
+class NeedsLearning(Fact):
+    """Hecho que indica que la entrada actual es una oportunidad de aprendizaje."""
+    pass
+
+class ReviewGoals(Fact):
+    """Hecho que dispara la revisión de metas activas."""
+    pass
+
 class ReasoningEngine(KnowledgeEngine):
     """Motor de razonamiento basado en reglas para MEA-Core."""
-    def __init__(self, responses):
+    def __init__(self, responses, brain_instance):
         super().__init__()
         self.responses = responses
+        self.brain = brain_instance # Referencia al cerebro para acceder a otros módulos
         self.response_generated = False
+        self.interaction_counter = 0
 
     @DefFacts()
     def _initial_facts(self):
@@ -44,20 +56,36 @@ class ReasoningEngine(KnowledgeEngine):
 
     @Rule(UserInput(text=MATCH.text))
     def handle_input(self, text):
-        # Esta regla se activa con cualquier entrada del usuario
-        # y puede ser usada para análisis más complejos.
-        # Por ahora, simplemente lo registramos.
         print(f"[Motor de Reglas] Hecho recibido: UserInput(text='{text}')")
+        self.interaction_counter += 1
+        if self.interaction_counter % 5 == 0: # Revisar metas cada 5 interacciones
+            self.declare(ReviewGoals())
 
     @Rule(AND(UserInput(text=L('hola') | L('buenos días') | L('buenas tardes'))))
     def handle_greeting(self):
         self.declare(BotAction(type='greet'))
 
-    @Rule(AND(UserInput(text=MATCH.text), salience= -1))
+    @Rule(AND(UserInput(text=MATCH.text), salience=-1))
     def handle_specific_questions(self, text):
         specific_responses = self.responses.get("respuestas_especificas", {})
         if text in specific_responses:
             self.declare(BotAction(type='respond_specific', key=text))
+
+    @Rule(salience=-10)
+    def handle_unknown_input(self):
+        if not self.response_generated:
+            self.declare(NeedsLearning())
+
+    @Rule(NeedsLearning())
+    def handle_learning_opportunity(self):
+        self.declare(BotAction(type='request_teaching'))
+
+    @Rule(ReviewGoals())
+    def review_goals(self):
+        active_goals = self.brain.goal_manager.list_goals(status='active')
+        if active_goals:
+            goal = active_goals[0]
+            self.declare(BotAction(type='report_goal_status', goal=goal))
 
     @Rule(BotAction(type='greet'))
     def action_greet(self):
@@ -69,10 +97,26 @@ class ReasoningEngine(KnowledgeEngine):
         self.response = self.responses["respuestas_especificas"][key]
         self.response_generated = True
 
+    @Rule(BotAction(type='request_teaching'))
+    def action_request_teaching(self):
+        self.response = ["No estoy seguro de cómo responder a eso. ¿Puedes enseñarme? Para hacerlo, usa el comando !teach."]
+        self.response_generated = True
+
+    @Rule(BotAction(type='report_goal_status', goal=MATCH.goal))
+    def action_report_goal_status(self, goal):
+        self.response = [
+            f"[Recordatorio de Meta] Estoy trabajando en: '{goal['name']}'",
+            f"Progreso: {goal['progress']:.0f}%"
+        ]
+        self.response_generated = True
+
     def get_response(self) -> Optional[List[str]]:
         if self.response_generated:
             return self.response
         return None
+
+    def get_rules(self):
+        return self.rules
 
 # --- Fin de la Integración del Motor de Reglas ---
 
@@ -81,51 +125,47 @@ class Brain:
     """
     Módulo de cerebro para MEA-Core-IA. Gestiona la selección de respuestas.
     """
-    def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any]):
-        self.settings = settings.get("brain", {})
-        self.mode = self.settings.get("mode", "rule_engine") # Cambiado a 'rule_engine' por defecto
+    def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any], memory: MemoryStore):
+        self.settings = settings
+        self.mode = self.settings.get("brain", {}).get("mode", "rule_engine")
         self.responses = responses
         self.model = None
-        self.knowledge_base = KnowledgeBase()
+        self.knowledge_base = KnowledgeBase(settings)
+        self.learning_module = ActiveLearningModule()
+        self.goal_manager = GoalManager(memory)
 
         if self.mode == "rule_engine" and EXPERTA_AVAILABLE:
-            self.reasoning_engine = ReasoningEngine(self.responses)
+            self.reasoning_engine = ReasoningEngine(self.responses, self)
             print("[Cerebro] Modo 'rule_engine' activado con Experta.")
-        elif self.mode == "rule_engine" and not EXPERTA_AVAILABLE:
-            print("[Advertencia] Experta no está instalado. Cambiando a modo 'rule'.")
-            print("Para usar el modo 'rule_engine', ejecuta: pip install experta")
-            self.mode = "rule"
-            self.reasoning_engine = None
         else:
+            # Fallback a modo 'rule' si experta no está disponible
             self.reasoning_engine = None
+            self.mode = "rule"
+            if EXPERTA_AVAILABLE:
+                print("[Advertencia] Experta no está instalado. Cambiando a modo 'rule'.")
+                print("Para usar el modo 'rule_engine', ejecuta: pip install experta")
 
         if self.mode == "ml" and SKLEARN_AVAILABLE:
             self._train_model()
         elif self.mode == "ml" and not SKLEARN_AVAILABLE:
             print("[Advertencia] scikit-learn no está instalado. Cambiando a modo 'rule'.")
-            print("Para usar el modo 'ml', ejecuta: pip install scikit-learn")
             self.mode = "rule"
 
     def _train_model(self):
         """Entrena un modelo de clasificación simple con las respuestas específicas."""
         intents = list(self.responses.get("respuestas_especificas", {}).keys())
         if not intents:
-            print("[Advertencia] No hay 'respuestas_especificas' para entrenar el modelo ML.")
             self.mode = "rule"
             return
 
-        X_train = intents
-        y_train = intents
+        X_train, y_train = intents, intents
         self.model = make_pipeline(TfidfVectorizer(), LogisticRegression())
         self.model.fit(X_train, y_train)
         print("[Cerebro] Modelo ML entrenado y listo.")
 
     def _get_response_from_kb(self, user_input: str) -> Optional[List[str]]:
         """Consulta la base de conocimiento usando búsqueda semántica (BM25)."""
-        search_threshold = self.settings.get("kb_search_threshold", 0.1)
-        
         results = self.knowledge_base.search(user_input, top_n=3)
-        
         if results:
             response = ["He encontrado estos principios que podrían ser relevantes:"]
             response.extend([f"- ({r[0]}) {r[2]}" for r in results])
