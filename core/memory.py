@@ -4,6 +4,7 @@ import sqlite3
 import time
 import os
 import uuid
+import json
 from typing import Optional, Dict, List, Any
 
 DB_PATH: str = "data/mea_memory.db"
@@ -30,6 +31,15 @@ class MemoryStore:
             id TEXT PRIMARY KEY,
             path TEXT NOT NULL,
             created_at REAL
+        )""")
+        # --- Nueva tabla para Memoria Episódica ---
+        self.conn.execute("""
+        CREATE TABLE IF NOT EXISTS episodic_memory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp REAL NOT NULL,
+            type TEXT NOT NULL,      -- ej: 'decision', 'learned_fact', 'user_preference'
+            source TEXT NOT NULL,    -- ej: 'brain', 'user_interaction', 'evolution_module'
+            data TEXT NOT NULL       -- JSON con los detalles del episodio
         )""")
         self.conn.commit()
 
@@ -70,12 +80,27 @@ class MemoryStore:
         bot_output_str = "\n".join(bot_output)
         self.conn.execute("INSERT INTO conversations (timestamp, user_input, bot_output) VALUES (?, ?, ?)", (now, user_input, bot_output_str))
         self.conn.commit()
+        # También registrar la conversación como un episodio
+        episode_data = {"user_input": user_input, "bot_output": bot_output_str}
+        self.log_episode("conversation", "user_interaction", episode_data)
+
+    def log_episode(self, type: str, source: str, data: Dict[str, Any]) -> None:
+        """Registra un evento estructurado (episodio) en la memoria a largo plazo."""
+        now: float = time.time()
+        data_json = json.dumps(data)
+        self.conn.execute(
+            "INSERT INTO episodic_memory (timestamp, type, source, data) VALUES (?, ?, ?, ?)",
+            (now, type, source, data_json)
+        )
+        self.conn.commit()
 
     def get_stats(self) -> Dict[str, Any]:
         """Devuelve estadísticas sobre el contenido de la memoria."""
         kv_count = self.conn.execute("SELECT COUNT(*) FROM kv").fetchone()[0]
         conv_count = self.conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+        ep_count = self.conn.execute("SELECT COUNT(*) FROM episodic_memory").fetchone()[0]
         return {
             "key_value_pairs": kv_count,
-            "conversations_logged": conv_count
+            "conversations_logged": conv_count,
+            "episodic_events": ep_count
         }
