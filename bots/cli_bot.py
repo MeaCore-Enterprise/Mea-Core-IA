@@ -15,7 +15,7 @@ from core.settings_manager import SettingsManager
 class CliBot:
     def __init__(self) -> None:
         self.settings_manager = SettingsManager()
-        self.responses = self._load_responses()
+        self.responses = self.settings_manager.get_responses()
         self.mem: MemoryStore = MemoryStore()
         self.ethics: EthicsCore = EthicsCore()
         self.brain: Brain = Brain(self.settings_manager.settings, self.responses)
@@ -23,14 +23,6 @@ class CliBot:
         self.swarm_controller: SwarmController = SwarmController(self.settings_manager.settings, self.mem)
         self.context: List[str] = []
         self.is_running: bool = True
-
-    def _load_responses(self) -> Dict[str, Any]:
-        try:
-            with open("config/responses.json", "r", encoding="utf-8") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            print("[ERROR] Archivo config/responses.json no encontrado.")
-            return {}
 
     def _show_settings_menu(self):
         while True:

@@ -1,8 +1,10 @@
+
+
 import sqlite3
 import time
 import os
 import uuid
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 
 DB_PATH: str = "data/mea_memory.db"
 
@@ -14,18 +16,15 @@ class MemoryStore:
         self._init_tables()
 
     def _init_tables(self) -> None:
-        # ... (kv and conversations tables remain the same)
         self.conn.execute("""
         CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT, updated_at REAL)
         """)
         self.conn.execute("""
         CREATE TABLE IF NOT EXISTS conversations (id INTEGER PRIMARY KEY, timestamp REAL, user_input TEXT, bot_output TEXT)
         """)
-        # Nueva tabla para la identidad de la instancia
         self.conn.execute("""
         CREATE TABLE IF NOT EXISTS instance (key TEXT PRIMARY KEY, value TEXT)
         """)
-        # Nueva tabla para registrar clones creados
         self.conn.execute("""
         CREATE TABLE IF NOT EXISTS replications (
             id TEXT PRIMARY KEY,
@@ -35,7 +34,6 @@ class MemoryStore:
         self.conn.commit()
 
     def get_instance_id(self) -> str:
-        """Obtiene el ID único de esta instancia, creándolo si no existe."""
         cursor = self.conn.execute("SELECT value FROM instance WHERE key = 'instance_id'")
         row = cursor.fetchone()
         if row:
@@ -47,7 +45,6 @@ class MemoryStore:
             return instance_id
 
     def log_replication(self, clone_id: str, path: str) -> None:
-        """Registra la creación de un nuevo clon en la base de datos."""
         self.conn.execute(
             "INSERT INTO replications (id, path, created_at) VALUES (?, ?, ?)",
             (clone_id, path, time.time())
@@ -73,3 +70,12 @@ class MemoryStore:
         bot_output_str = "\n".join(bot_output)
         self.conn.execute("INSERT INTO conversations (timestamp, user_input, bot_output) VALUES (?, ?, ?)", (now, user_input, bot_output_str))
         self.conn.commit()
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Devuelve estadísticas sobre el contenido de la memoria."""
+        kv_count = self.conn.execute("SELECT COUNT(*) FROM kv").fetchone()[0]
+        conv_count = self.conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+        return {
+            "key_value_pairs": kv_count,
+            "conversations_logged": conv_count
+        }

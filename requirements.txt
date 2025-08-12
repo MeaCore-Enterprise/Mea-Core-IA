@@ -5,3 +5,6 @@ scikit-learn
 fastapi
 uvicorn[standard]
 requests
+rank-bm25
+experta
+gensim

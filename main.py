@@ -69,12 +69,11 @@ def main():
     initialize_knowledge_base()
 
     # Cargar settings para decidir si iniciar el servidor
-    try:
-        with open("config/settings.json", "r") as f:
-            settings = json.load(f)
+    from core.settings_manager import SettingsManager
+    settings_manager = SettingsManager()
+    settings = settings_manager.settings
+    if settings:
         start_server_if_needed(settings)
-    except FileNotFoundError:
-        print("[Advertencia] No se encontró config/settings.json. Omitiendo inicio de servidor.")
 
     print("--- Entorno verificado. Iniciando IA... ---")
     from bots.cli_bot import CliBot
