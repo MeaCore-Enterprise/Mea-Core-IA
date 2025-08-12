@@ -93,4 +93,4 @@ pytest
 Crear una IA que funcione como "Jarvis para todos", incluso en PCs antiguas.
 
 ¿Te animas a contribuir o proponer ideas?  
-🛸 Abre un Issue, haz un Fork o contacta por redes MEA-Tecnology.
+🛸 Abre un Issue, haz un Fork o contacta por redes MEA-Technology.
