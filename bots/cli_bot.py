@@ -6,22 +6,24 @@ from typing import Any, List, Dict
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.memory import MemoryStore
+from core.memory_store import MemoryStore
 from core.ethics import EthicsCore
 from core.brain import Brain
 from core.remote_logger import RemoteLogger
-from core.swarm import SwarmController
+from core.swarm_controller import SwarmController
+from core.knowledge_base import KnowledgeBase
 from core.settings_manager import SettingsManager
 
 class CliBot:
     def __init__(self) -> None:
         self.settings_manager = SettingsManager()
         self.responses = self.settings_manager.get_responses()
-        self.mem: MemoryStore = MemoryStore(self.settings_manager)
-        self.ethics: EthicsCore = EthicsCore()
-        self.brain: Brain = Brain(self.settings_manager.settings, self.responses, self.mem)
-        self.remote_logger: RemoteLogger = RemoteLogger(self.settings_manager.settings)
-        self.swarm_controller: SwarmController = SwarmController(self.settings_manager.settings, self.mem)
+        self.memory = MemoryStore()
+        self.knowledge_base = KnowledgeBase([])
+        self.swarm_controller = SwarmController(node_id="cli")
+        self.ethics = EthicsCore()
+        self.brain = Brain(self.settings_manager.settings, self.responses, memory=self.memory, knowledge_base=self.knowledge_base, swarm_controller=self.swarm_controller)
+        self.remote_logger = RemoteLogger(self.settings_manager.settings)
         self.context: List[str] = []
         self.is_running: bool = True
 
@@ -30,20 +32,20 @@ class CliBot:
             remote_enabled = self.remote_logger.enabled
             swarm_enabled = self.swarm_controller.replication_enabled
             print("\n--- Submenú de Configuración ---")
-            print(f"1. Aprendizaje Remoto      : {"ACTIVADO" if remote_enabled else "DESACTIVADO"}")
-            print(f"2. Replicación en Enjambre : {"ACTIVADA" if swarm_enabled else "DESACTIVADA"}")
+            print(f"1. Aprendizaje Remoto      : {'ACTIVADO' if remote_enabled else 'DESACTIVADO'}")
+            print(f"2. Replicación en Enjambre : {'ACTIVADA' if swarm_enabled else 'DESACTIVADA'}")
             print("Escribe '1' o '2' para cambiar la opción, o 'salir' para volver.")
             choice = input("Opción >> ").strip().lower()
             if choice == '1':
                 new_status = not remote_enabled
                 self.settings_manager.set_value('remote_learning.enabled', new_status)
                 self.remote_logger.enabled = new_status
-                print(f"El Aprendizaje Remoto ha sido {"ACTIVADO" if new_status else "DESACTIVADO"}.")
+                print(f"El Aprendizaje Remoto ha sido {'ACTIVADO' if new_status else 'DESACTIVADO'}.")
             elif choice == '2':
                 new_status = not swarm_enabled
                 self.settings_manager.set_value('swarm.replication_enabled', new_status)
                 self.swarm_controller.replication_enabled = new_status
-                print(f"La Replicación en Enjambre ha sido {"ACTIVADA" if new_status else "DESACTIVADA"}.")
+                print(f"La Replicación en Enjambre ha sido {'ACTIVADA' if new_status else 'DESACTIVADA'}.")
             elif choice in ['salir', 'exit', 'quit']:
                 print("Volviendo a la conversación...")
                 break
@@ -94,28 +96,27 @@ class CliBot:
         if q.startswith("!set "):
             try:
                 _, key, *rest = q.split()
-                self.mem.set(key, " ".join(rest))
-                print(f"[Memoria] {key} = {" ".join(rest)}")
+                self.memory.set(key, " ".join(rest))
+                print(f"[Memoria] {key} = {' '.join(rest)}")
             except ValueError:
                 print("[Error] Comando !set mal formado.")
             return True
         if q.startswith("!get "):
             try:
                 _, key = q.split()
-                print(f"[Memoria] {key} -> {self.mem.get(key) or 'No encontrado'}")
+                print(f"[Memoria] {key} -> {self.memory.get(key) or 'No encontrado'}")
             except ValueError:
                 print("[Error] Comando !get mal formado.")
             return True
         if q_lower == "!dump":
-            print("[Memoria] Dump completo:", self.mem.dump_all())
+            print("[Memoria] Dump completo:", self.memory.dump_all())
             return True
         if q_lower == "!stats":
-            print("[Estadísticas]", self.mem.get_stats())
+            print("[Estadísticas]", self.memory.get_stats())
             return True
         if q_lower == "!rules":
             if self.brain.reasoning_engine:
                 print("--- Reglas del Motor de Razonamiento ---")
-                # Accedemos a las reglas a través del método get_rules() que deberíamos añadir en el motor
                 for name, rule in self.brain.reasoning_engine.get_rules().items():
                     print(f"- {name}: {rule.__doc__ or 'Sin descripción'}")
             else:
@@ -126,8 +127,7 @@ class CliBot:
             return True
         if q.startswith("!addgoal "):
             try:
-                parts = q[len("!addgoal "):
-].split(';')
+                parts = q[len("!addgoal "):].split(';')
                 name = parts[0].strip()
                 description = parts[1].strip()
                 tasks = [t.strip() for t in parts[2].split(',')]
@@ -268,7 +268,7 @@ class CliBot:
         return False
 
     def setup(self) -> None:
-        instance_id = self.mem.get_instance_id()
+        instance_id = self.memory.get_instance_id()
         print(f"--- Iniciando Mea-Core (ID: {instance_id[:8]}) ---")
         if self.remote_logger.enabled:
             print("[INFO] Aprendizaje remoto: ACTIVADO")
@@ -289,7 +289,7 @@ class CliBot:
         respuestas = self.brain.get_response(q)
         for respuesta in respuestas:
             print(respuesta)
-        self.mem.log_conversation(user_input=q, bot_output=respuestas)
+        self.memory.log_conversation(user_input=q, bot_output=respuestas)
         self.remote_logger.log(user_input=q, bot_output=respuestas)
         self.context.append(q)
 
@@ -297,7 +297,8 @@ class CliBot:
         self.setup()
         while self.is_running:
             try:
-                self.swarm_controller.run_replication_cycle()
+                if hasattr(self.swarm_controller, 'run_replication_cycle'):
+                    self.swarm_controller.run_replication_cycle()
                 q = input(">> ").strip()
                 if q.lower() in {"exit", "quit", "salir"}:
                     print(self.brain.get_farewell())

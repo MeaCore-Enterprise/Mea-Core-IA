@@ -2,11 +2,14 @@ import json
 import os
 import random
 from typing import Any, Dict, List, Optional
+from core.memory_consolidator import MemoryConsolidator
+from core.rules_engine import RulesEngine
 
-from core.knowledge import KnowledgeBase
+from core.knowledge_base import KnowledgeBase
 from core.evolution import ActiveLearningModule
 from core.goals import GoalManager
-from core.memory import MemoryStore
+from core.memory_store import MemoryStore
+from core.swarm_controller import SwarmController
 
 # Intentar importar scikit-learn y manejar el fallo si no está instalado
 try:
@@ -65,7 +68,7 @@ class ReasoningEngine(KnowledgeEngine):
     def handle_greeting(self):
         self.declare(BotAction(type='greet'))
 
-    @Rule(AND(UserInput(text=MATCH.text), salience=-1))
+    @Rule(AND(UserInput(text=MATCH.text)), salience=-1)
     def handle_specific_questions(self, text):
         specific_responses = self.responses.get("respuestas_especificas", {})
         if text in specific_responses:
@@ -121,18 +124,47 @@ class ReasoningEngine(KnowledgeEngine):
 # --- Fin de la Integración del Motor de Reglas ---
 
 
+
+
+# --- Clase principal del cerebro ---
 class Brain:
     """
-    Módulo de cerebro para MEA-Core-IA. Gestiona la selección de respuestas.
+    Módulo de cerebro para MEA-Core-IA. Gestiona la selección de respuestas y la integración de memoria, conocimiento y enjambre.
     """
-    def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any], memory: MemoryStore):
+    def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any],
+                 memory: Optional[MemoryStore] = None,
+                 knowledge_base: Optional[KnowledgeBase] = None,
+                 swarm_controller: Optional[SwarmController] = None):
         self.settings = settings
         self.mode = self.settings.get("brain", {}).get("mode", "rule_engine")
         self.responses = responses
         self.model = None
-        self.knowledge_base = KnowledgeBase(settings)
+        self.memory = memory or MemoryStore()
+        self.knowledge_base = knowledge_base or KnowledgeBase([])
+        self.swarm_controller = swarm_controller or SwarmController(node_id="default")
         self.learning_module = ActiveLearningModule()
-        self.goal_manager = GoalManager(memory)
+        self.goal_manager = GoalManager(self.memory)
+
+        # Módulos de consolidación de memoria y motor de reglas dinámicas
+        self.memory_consolidator = MemoryConsolidator()
+        self.rules_engine = RulesEngine()
+    # --- Consolidación de Memoria ---
+    def resumir_conversacion(self, texto: str) -> str:
+        return self.memory_consolidator.summarize_conversation(texto)
+
+    def extraer_entidades(self, texto: str):
+        self.memory_consolidator.extract_entities(texto)
+        return self.memory_consolidator.get_entities()
+
+    # --- Motor de Reglas Dinámicas ---
+    def aplicar_reglas(self, texto: str) -> str:
+        return self.rules_engine.apply(texto)
+
+    def agregar_regla(self, condicion: str, accion: str):
+        self.rules_engine.add_rule(condicion, accion)
+
+    def listar_reglas(self):
+        return self.rules_engine.list_rules()
 
         if self.mode == "rule_engine" and EXPERTA_AVAILABLE:
             self.reasoning_engine = ReasoningEngine(self.responses, self)
@@ -164,13 +196,17 @@ class Brain:
         print("[Cerebro] Modelo ML entrenado y listo.")
 
     def _get_response_from_kb(self, user_input: str) -> Optional[List[str]]:
-        """Consulta la base de conocimiento usando búsqueda semántica (BM25)."""
-        results = self.knowledge_base.search(user_input, top_n=3)
-        if results:
-            response = ["He encontrado estos principios que podrían ser relevantes:"]
-            response.extend([f"- ({r[0]}) {r[2]}" for r in results])
-            return response
-        return None
+        """Consulta la base de conocimiento usando BM25F y búsqueda semántica."""
+        bm25_results = self.knowledge_base.bm25_search(user_input, top_n=3)
+        sem_results = self.knowledge_base.semantic_search(user_input, top_n=2)
+        response = []
+        if bm25_results:
+            response.append("[BM25] Resultados relevantes:")
+            response.extend([f"- {r}" for r in bm25_results])
+        if sem_results:
+            response.append("[Semántica] Resultados similares:")
+            response.extend([f"- {r}" for r in sem_results])
+        return response if response else None
 
     def get_response(self, user_input: str, context: Optional[List[str]] = None) -> List[str]:
         """

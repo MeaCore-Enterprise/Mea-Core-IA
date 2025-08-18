@@ -96,12 +96,3 @@ class MeaTelegramBot:
 
         print("Iniciando bot de Telegram...")
         # Iniciar ciclo de enjambre en segundo plano (de forma síncrona en un hilo)
-        # Nota: Telegram Ext v20 corre en asyncio, pero el SwarmController es síncrono.
-        # Para una mejor integración, SwarmController debería ser async.
-        # Por ahora, lo omitimos para no complicar el bot de Telegram.
-
-        application.run_polling()
-
-if __name__ == '__main__':
-    bot = MeaTelegramBot()
-    bot.run()
