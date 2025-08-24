@@ -1,5 +1,7 @@
 # 🧠 MEA-Core: IA Ligera Local
 
+[![CI/CD Status](https://github.com/MEA-Technology/MEA-Core-IA/actions/workflows/ci.yml/badge.svg)](https://github.com/MEA-Technology/MEA-Core-IA/actions/workflows/ci.yml)
+
 ¡Bienvenido a MEA-Core! Este es un proyecto experimental para desarrollar una inteligencia artificial **extremadamente ligera**, que corre localmente en hardware limitado, sin depender de servidores ni nubes.
 
 ---
@@ -30,9 +32,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Poblar la Base de Conocimiento (¡Nuevo!)
+> **Nota:** Algunas funcionalidades avanzadas (como el modo `rule_engine`) requieren librerías adicionales. Si el sistema te lo indica, puedes instalarlas con `pip install experta`.
 
-La IA ahora puede aprender de documentos externos. Hemos incluido un importador para los "Manifiestos de IA". Ejecútalo una vez para poblar la base de conocimiento.
+### 3. Poblar la Base de Conocimiento
+
+La IA puede aprender de documentos externos. Ejecuta el siguiente script una vez para poblar la base de conocimiento inicial.
 
 ```bash
 python tools/import_manifestos.py
@@ -50,47 +54,52 @@ Ahora puedes hacerle preguntas como `¿cuáles son tus principios éticos?`.
 
 ---
 
-## 🛠️ Herramientas Adicionales
+## ✅ Pruebas e Integración Continua
 
-### Backup de Bases de Datos
-
-Para crear una copia de seguridad de tu memoria de conversaciones (`mea_memory.db`) y de la base de conocimiento (`knowledge_base.db`), ejecuta:
-
-```bash
-python tools/backup_db.py
-```
-Los backups se guardarán en la carpeta `data/backups/`.
-
----
-
-## ✅ Ejecutar las Pruebas
-
-El proyecto incluye un conjunto de pruebas unitarias y de integración para asegurar la calidad del código. Ahora hay 22 tests.
+El proyecto utiliza `pytest` para las pruebas unitarias y de integración. Para ejecutar todas las pruebas localmente:
 
 ```bash
 pytest
 ```
 
----
-
-## 🤖 Arquitectura Avanzada
-
-### Aprendizaje Remoto y Servidor Central
-
-- **Función:** Mea-Core puede enviar las conversaciones a un servidor central para un análisis y aprendizaje a mayor escala.
-- **Configuración:** Se controla desde `config/settings.json` -> `remote_learning` -> `enabled` (por defecto `false`).
-- **Para ejecutar el servidor:** Abre una segunda terminal y corre `uvicorn server.main:app --reload`.
-
-### Cerebro Neuronal
-
-- **Función:** El `core/brain.py` puede usar un clasificador de texto (TF-IDF + Regresión Logística) para encontrar la mejor respuesta.
-- **Configuración:** Se controla desde `config/settings.json` -> `brain` -> `mode` (`rule` o `ml`).
-- **Fallback:** Si `scikit-learn` no está instalado, el sistema volverá al modo `rule` automáticamente.
+Hemos configurado un pipeline de Integración Continua (CI) con GitHub Actions. Las pruebas se ejecutan automáticamente en cada `push` y `pull request` para asegurar la calidad y estabilidad del código.
 
 ---
 
-## 💡 Meta final
-Crear una IA que funcione como "Jarvis para todos", incluso en PCs antiguas.
+## 🤖 Arquitectura y Modos de Operación
 
-¿Te animas a contribuir o proponer ideas?  
-🛸 Abre un Issue, haz un Fork o contacta por redes MEA-Technology.
+El `core/brain.py` es el componente central que orquesta la respuesta de la IA. Puede operar en tres modos distintos, configurables en `config/settings.json` bajo la clave `brain.mode`.
+
+### Modo `rule_engine` (Por Defecto)
+- **Descripción:** Es el modo más avanzado y recomendado. Utiliza un motor de reglas basado en la librería `Experta` para un razonamiento complejo y contextual.
+- **Fortalezas:** Permite definir comportamientos sofisticados y manejar diálogos de manera más fluida.
+
+### Modo `ml` (Machine Learning)
+- **Descripción:** Utiliza un modelo de clasificación de texto simple (TF-IDF + Regresión Logística con `scikit-learn`) para determinar la intención del usuario y elegir una respuesta.
+- **Fallback:** Si `scikit-learn` no está instalado, el sistema no podrá usar este modo.
+
+### Modo `rule` (Simple)
+- **Descripción:** Un sistema básico de mapeo directo `pregunta -> respuesta`. Es el modo más simple y se utiliza como fallback si los otros modos no están disponibles o no encuentran una respuesta.
+
+### Servidor para Aprendizaje Remoto
+- **Función:** De manera opcional, Mea-Core puede enviar conversaciones a un servidor central para análisis y aprendizaje a mayor escala.
+- **Configuración:** Se controla desde `config/settings.json` -> `remote_learning` -> `enabled`.
+- **Ejecución:** `uvicorn server.main:app --reload`.
+
+---
+
+## 🛠️ Herramientas Adicionales
+
+Para crear una copia de seguridad de las bases de datos (`memoria` y `conocimiento`), ejecuta:
+
+```bash
+python tools/backup_db.py
+```
+
+---
+
+## 💡 Meta y Contribuciones
+
+La meta final es crear una IA que funcione como "Jarvis para todos".
+
+¡Las contribuciones son bienvenidas! Nuestro pipeline de CI validará tus cambios. No dudes en abrir un Issue, hacer un Fork o contactar por redes a MEA-Technology.
