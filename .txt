@@ -1,0 +1,466 @@
+# Plan Maestro para el Desarrollo de una IA Avanzada
+
+Este documento describe un plan detallado y de largo plazo para el desarrollo de una IA con capacidades avanzadas, con el objetivo de lograr un avance significativo sobre las IA actuales. El plan está estructurado en fases anidadas, abarcando desde la consolidación inicial hasta las capacidades más sofisticadas.
+
+## Fase 1: Consolidación y Optimización del Núcleo
+
+Consolidar y optimizar la base de código existente, estableciendo una arquitectura limpia y modular.
+
+1.  Limpieza del Repositorio
+    1.1. Eliminar directorios y archivos obsoletos.
+        1.1.1. Eliminar directorio "Otras IA".
+        1.1.2. Revisar y eliminar archivos temporales o de respaldo innecesarios.
+    1.2. Organizar la estructura de directorios.
+        1.2.1. Asegurar que los módulos principales estén en `core/`.
+        1.2.2. Organizar los bots en `bots/`.
+        1.2.3. Organizar las configuraciones en `config/`.
+        1.2.4. Organizar la data en `data/`.
+        1.2.5. Organizar la documentación en `docs/`.
+        1.2.6. Organizar los plugins en `plugins/`.
+        1.2.7. Organizar el servidor en `server/`.
+        1.2.8. Organizar los tests en `tests/`.
+        1.2.9. Organizar las herramientas en `tools/`.
+    1.3. Estandarizar nombres de archivos y variables.
+        1.3.1. Aplicar convenciones de nomenclatura consistentes (ej. snake_case para archivos Python).
+        1.3.2. Revisar nombres de variables para claridad y consistencia.
+
+2.  Refactorización y Unificación de Módulos
+    2.1. Identificar y eliminar código duplicado.
+        2.1.1. Analizar el código en busca de funciones o clases repetidas.
+        2.1.2. Crear funciones o clases comunes para el código repetido.
+    2.2. Unificar la lógica de módulos similares.
+        2.2.1. Consolidar la lógica de ética (ej. `core/ethics.py`).
+        2.2.2. Revisar otros módulos principales para posibles unificaciones.
+    2.3. Mejorar la modularidad de los componentes.
+        2.3.1. Asegurar que cada módulo tenga una responsabilidad clara.
+        2.3.2. Minimizar las dependencias entre módulos.
+    2.4. Optimizar el rendimiento del código existente.
+        2.4.1. Perfilar los módulos principales para identificar cuellos de botella.
+        2.4.2. Optimizar algoritmos y estructuras de datos.
+        2.4.3. Reducir el consumo de memoria donde sea posible.
+
+3.  Implementación de Pruebas Automatizadas
+    3.1. Desarrollar pruebas unitarias para cada módulo.
+        3.1.1. Escribir pruebas para `core/brain.py`.
+        3.1.2. Escribir pruebas para `core/curiosity.py`.
+        3.1.3. Escribir pruebas para `core/engine.py`.
+        3.1.4. Escribir pruebas para `core/ethics.py`.
+        3.1.5. Escribir pruebas para `core/evolution.py`.
+        3.1.6. Escribir pruebas para `core/goals.py`.
+        3.1.7. Escribir pruebas para `core/hardware.py`.
+        3.1.8. Escribir pruebas para `core/knowledge.py`.
+        3.1.9. Escribir pruebas para `core/loader.py`.
+        3.1.10. Escribir pruebas para `core/memory.py`.
+        3.1.11. Escribir pruebas para `core/parser.py`.
+        3.1.12. Escribir pruebas para `core/personality.py`.
+        3.1.13. Escribir pruebas para `core/remote_logger.py`.
+        3.1.14. Escribir pruebas para `core/security.py`.
+        3.1.15. Escribir pruebas para `core/settings_manager.py`.
+        3.1.16. Escribir pruebas para `core/swarm.py`.
+        3.1.17. Escribir pruebas para `bots/cli_bot.py`.
+        3.1.18. Escribir pruebas para `bots/discord_bot.py`.
+        3.1.19. Escribir pruebas para `bots/telegram_bot.py`.
+        3.1.20. Escribir pruebas para `server/main.py`.
+        3.1.21. Escribir pruebas para `plugins/logger.py`.
+        3.1.22. Escribir pruebas para `tools/backup_db.py`.
+        3.1.23. Escribir pruebas para `tools/import_manifestos.py`.
+        3.1.24. Escribir pruebas para `tools/mac_changer.py`.
+    3.2. Desarrollar pruebas de integración.
+        3.2.1. Probar la integración entre el `engine` y los módulos del `core`.
+        3.2.2. Probar la integración entre los bots y el `engine`.
+        3.2.3. Probar la integración del servidor con los módulos relevantes.
+        3.2.4. Probar la interacción con las bases de datos (`data/`).
+    3.3. Configurar un pipeline de integración continua (CI).
+        3.3.1. Seleccionar una herramienta de CI (ej. GitHub Actions).
+        3.3.2. Configurar el repositorio para ejecutar pruebas automáticamente.
+        3.3.3. Configurar notificaciones para fallos en las pruebas.
+
+4.  Mejora de la Documentación
+    4.1. Documentar el código fuente con docstrings.
+        4.1.1. Añadir docstrings a funciones y clases en `core/`.
+        4.1.2. Añadir docstrings a funciones y clases en `bots/`.
+        4.1.3. Añadir docstrings a funciones y clases en `server/`.
+        4.1.4. Añadir docstrings a funciones y clases en `plugins/`.
+        4.1.5. Añadir docstrings a scripts en `tools/`.
+    4.2. Crear documentación de alto nivel (arquitectura, flujo de datos).
+        4.2.1. Describir la arquitectura general del sistema.
+        4.2.2. Documentar el flujo de datos entre los módulos principales.
+        4.2.3. Explicar cómo funcionan los plugins.
+        4.2.4. Documentar la estructura de las bases de datos.
+    4.3. Actualizar documentos existentes.
+        4.3.1. Revisar y actualizar `README.md`.
+        4.3.2. Revisar y actualizar `CONTRIBUTING.md`.
+        4.3.3. Revisar y actualizar `LICENSE`.
+        4.3.4. Revisar y actualizar `CODE_OF_CONDUCT.md`.
+        4.3.5. Revisar y actualizar `SECURITY.md`.
+        4.3.6. Revisar y actualizar `docs/MANIFIESTO_IA.md`.
+        4.3.7. Revisar y actualizar `docs/ROADMAP.md`.
+        4.3.8. Revisar y actualizar `docs/ROADMAP_TECNICO.md`.
+
+## Fase 2: Desarrollo de Capacidades Avanzadas de Memoria y Conocimiento
+
+Desarrollar un sistema de memoria y conocimiento dinámico, contextual y auto-organizable.
+
+5.  Arquitectura de la Memoria Avanzada
+    5.1. Diseño del sistema de memoria a largo plazo.
+        5.1.1. Investigar modelos de memoria a largo plazo en IA y neurociencia.
+        5.1.2. Definir la estructura de los "recuerdos" (eventos, hechos, conceptos).
+        5.1.3. Diseñar un mecanismo de indexación y recuperación eficiente.
+    5.2. Implementación de la memoria a largo plazo.
+        5.2.1. Ampliar o reemplazar `data/mea_memory.db` y `data/central_memory.db`.
+        5.2.2. Desarrollar el código para almacenar nuevos recuerdos (`core/memory.py`).
+        5.2.3. Desarrollar el código para recuperar recuerdos relevantes.
+    5.3. Desarrollo de la memoria a corto plazo/de trabajo.
+        5.3.1. Definir la estructura y capacidad de la memoria de trabajo.
+        5.3.2. Implementar mecanismos para mantener información activa durante una interacción.
+        5.3.3. Implementar mecanismos para transferir información de trabajo a largo plazo.
+
+6.  Mecanismos de Olvido Selectivo
+    6.1. Investigar modelos de olvido en sistemas biológicos.
+        6.1.1. Estudiar la consolidación y la interferencia en la memoria.
+    6.2. Diseñar un algoritmo de olvido basado en la relevancia.
+        6.2.1. Definir métricas para evaluar la relevancia de un recuerdo.
+        6.2.2. Diseñar un proceso para degradar o eliminar recuerdos de baja relevancia.
+    6.3. Implementar el mecanismo de olvido.
+        6.3.1. Modificar el proceso de almacenamiento para incluir una "vida útil" o "puntuación de relevancia".
+        6.3.2. Implementar un proceso en segundo plano para gestionar el olvido.
+
+7.  Contextualización de la Información
+    7.1. Desarrollar un sistema para rastrear el contexto de una conversación o tarea.
+        7.1.1. Identificar entidades, temas y relaciones en el contexto actual.
+        7.1.2. Mantener un "estado de contexto" dinámico.
+    7.2. Utilizar el contexto para mejorar la recuperación de memoria.
+        7.2.1. Ponderar los recuerdos en función de su relación con el contexto actual.
+        7.2.2. Filtrar recuerdos irrelevantes para el contexto.
+    7.3. Utilizar el contexto para desambiguar información.
+        7.3.1. Resolver referencias pronominales y elipsis basadas en el contexto.
+
+8.  Generalización de Conocimientos
+    8.1. Investigar técnicas de aprendizaje por transferencia y aprendizaje multi-tarea.
+        8.1.1. Estudiar cómo transferir conocimientos aprendidos en una tarea a otra.
+        8.1.2. Estudiar cómo aprender múltiples tareas simultáneamente.
+    8.2. Desarrollar algoritmos para identificar patrones y relaciones abstractas en los datos.
+        8.2.1. Implementar técnicas de clustering o análisis de componentes.
+        8.2.2. Explorar el uso de grafos de conocimiento para representar relaciones abstractas.
+    8.3. Implementar la capacidad de aplicar conocimientos a nuevos dominios.
+        8.3.1. Desarrollar mecanismos de razonamiento analógico.
+        8.3.2. Permitir que la IA adapte sus respuestas o acciones basadas en principios generales.
+
+9.  Base de Conocimiento Dinámica y Auto-organizable
+    9.1. Ampliar o reemplazar `data/knowledge_base.db`.
+        9.1.1. Investigar diferentes estructuras de bases de conocimiento (grafos de conocimiento, ontologías).
+        9.1.2. Seleccionar o diseñar una estructura escalable.
+    9.2. Desarrollar un proceso para adquirir nuevo conocimiento automáticamente.
+        9.2.1. Implementar técnicas de extracción de información de texto (NER, relación extraction).
+        9.2.2. Desarrollar la capacidad de integrar conocimiento de diversas fuentes.
+    9.3. Implementar mecanismos de auto-organización y mantenimiento de la base de conocimiento.
+        9.3.1. Detectar y resolver inconsistencias en el conocimiento.
+        9.3.2. Reorganizar el conocimiento para optimizar la recuperación.
+        9.3.3. Priorizar la adquisición de conocimiento relevante para los objetivos.
+
+10. Mecanismos de Aprendizaje Continuo
+    10.1. Diseñar una arquitectura que permita el aprendizaje incremental.
+        10.1.1. Evitar el olvido catastrófico al aprender nuevas tareas o información.
+        10.1.2. Permitir que la IA siga aprendiendo después del entrenamiento inicial.
+    10.2. Implementar un bucle de retroalimentación para el aprendizaje.
+        10.2.1. Utilizar las interacciones con los usuarios o el entorno como datos de entrenamiento.
+        10.2.2. Desarrollar métricas para evaluar el desempeño del aprendizaje continuo.
+    10.3. Desarrollar técnicas de aprendizaje auto-supervisado o no supervisado.
+        10.3.1. Permitir que la IA aprenda de datos no etiquetados.
+
+## Fase 3: Fortalecimiento de la Ética y la Seguridad
+
+Integrar la ética y la seguridad de forma profunda en la arquitectura y el comportamiento de la IA.
+
+11. Arquitectura de Ética Integrada
+    11.1. Formalizar los principios éticos.
+        11.1.1. Definir un conjunto de principios éticos básicos (alineados con `docs/MANIFIESTO_IA.md`).
+        11.1.2. Representar estos principios de forma computable.
+    11.2. Desarrollar un "motor ético" que evalúe acciones potenciales.
+        11.2.1. Crear un componente (`core/ethics.py` avanzado) que reciba acciones propuestas.
+        11.2.2. Implementar lógica para comparar acciones con principios éticos.
+        11.2.3. Asignar una "puntuación ética" a las acciones.
+    11.3. Integrar el motor ético en el proceso de toma de decisiones.
+        11.3.1. Modificar el `core/engine.py` para consultar el motor ético antes de ejecutar acciones.
+        11.3.2. Implementar mecanismos para descartar o modificar acciones poco éticas.
+
+12. Monitoreo y Detección de Anomalías
+    12.1. Desarrollar un sistema para monitorear el comportamiento interno de la IA.
+        12.1.1. Registrar las decisiones tomadas por la IA.
+        12.1.2. Registrar el flujo de información entre módulos.
+    12.2. Implementar algoritmos para detectar comportamientos anómalos o no deseados.
+        12.2.1. Definir lo que constituye un comportamiento anómalo (ej. acciones conflictivas con los objetivos).
+        12.2.2. Desarrollar modelos de detección de anomalías basados en el comportamiento normal.
+    12.3. Desarrollar mecanismos de alerta para comportamientos detectados.
+        12.3.1. Notificar a los operadores humanos sobre anomalías críticas.
+        12.3.2. Registrar las anomalías detectadas para su análisis posterior.
+
+13. Mecanismos de Auto-regulación
+    13.1. Desarrollar la capacidad de la IA para evaluar su propio comportamiento.
+        13.1.1. Permitir que la IA analice sus registros de comportamiento.
+        13.1.2. Comparar el comportamiento real con los principios éticos y los objetivos.
+    13.2. Implementar mecanismos para ajustar el comportamiento en función de la evaluación.
+        13.2.1. Modificar parámetros o algoritmos para evitar comportamientos no deseados.
+        13.2.2. Aprender de los errores éticos o de seguridad.
+    13.3. Desarrollar un "modo seguro" o "modo de emergencia".
+        13.3.1. Definir condiciones bajo las cuales la IA debe entrar en un estado restringido.
+        13.3.2. Implementar la lógica para activar y operar en el modo seguro.
+
+14. Robustez contra Ataques Adversario
+    14.1. Investigar tipos comunes de ataques adversario contra sistemas de IA.
+        14.1.1. Estudiar ataques de envenenamiento de datos.
+        14.1.2. Estudiar ataques de evasión (engañar al modelo).
+        14.1.3. Estudiar ataques de inferencia de modelo.
+    14.2. Desarrollar técnicas para mejorar la robustez de los modelos de IA.
+        14.2.1. Implementar entrenamiento adversario.
+        14.2.2. Desarrollar mecanismos de detección de entradas adversarias.
+    14.3. Asegurar la integridad de las bases de datos y la configuración.
+        14.3.1. Implementar mecanismos de autenticación y autorización robustos.
+        14.3.2. Desarrollar sistemas de detección de intrusiones internos.
+
+15. Transparencia y Explicabilidad (XAI)
+    15.1. Desarrollar la capacidad de la IA para explicar su razonamiento.
+        15.1.1. Implementar técnicas de XAI para modelos de caja negra (ej. LIME, SHAP).
+        15.1.2. Desarrollar mecanismos para generar explicaciones en lenguaje natural.
+    15.2. Registrar el proceso de toma de decisiones.
+        15.2.1. Documentar los pasos seguidos por la IA para llegar a una conclusión o acción.
+        15.2.2. Permitir la auditoría de las decisiones de la IA.
+    15.3. Permitir la "depuración ética".
+        15.3.1. Desarrollar herramientas para investigar por qué la IA tomó una decisión particular.
+        15.3.2. Utilizar las explicaciones para identificar sesgos o fallos en la lógica ética.
+
+16. Cumplimiento Normativo y Legal
+    16.1. Investigar las leyes y regulaciones relevantes sobre IA y privacidad.
+        16.1.1. Estudiar regulaciones como GDPR, leyes de privacidad de datos.
+        16.1.2. Monitorear los desarrollos legales y normativos.
+    16.2. Implementar mecanismos para garantizar el cumplimiento.
+        16.2.1. Anonimizar o seudonimizar datos sensibles.
+        16.2.2. Implementar políticas de retención de datos.
+        16.2.3. Permitir el "derecho al olvido" si es aplicable.
+    16.3. Desarrollar la capacidad de la IA para operar dentro de restricciones legales y éticas.
+
+## Fase 4: Desarrollo de Capacidades de Evolución y Auto-mejora
+
+Permitir que la IA analice, evalúe y modifique su propio código, algoritmos y arquitectura para mejorar.
+
+17. Análisis y Comprensión del Propio Código
+    17.1. Desarrollar un modelo de la propia arquitectura y código base.
+        17.1.1. Crear un grafo de dependencias del código.
+        17.1.2. Generar representaciones semánticas del código.
+    17.2. Implementar herramientas de análisis estático y dinámico del código.
+        17.2.1. Desarrollar analizadores de código para identificar patrones y estructuras.
+        17.2.2. Implementar herramientas para monitorear la ejecución del código en tiempo real.
+    17.3. Desarrollar la capacidad de la IA para "leer" y entender su propio código.
+        17.3.1. Aplicar técnicas de procesamiento del lenguaje natural al código fuente.
+        17.3.2. Entrenar modelos para predecir el comportamiento del código.
+
+18. Identificación de Ineficiencias y Áreas de Mejora
+    18.1. Desarrollar métricas para evaluar el rendimiento del código.
+        18.1.1. Medir el tiempo de ejecución de funciones y módulos.
+        18.1.2. Medir el consumo de memoria y CPU.
+        18.1.3. Medir la complejidad ciclomática y otras métricas de calidad del código.
+    18.2. Implementar algoritmos para identificar cuellos de botella y código redundante.
+        18.2.1. Utilizar perfiles de rendimiento para localizar áreas lentas.
+        18.2.2. Aplicar técnicas de detección de código duplicado.
+    18.3. Desarrollar la capacidad de la IA para identificar oportunidades de mejora.
+        18.3.1. Analizar los registros de errores para encontrar fuentes recurrentes de fallos.
+        18.3.2. Comparar el código actual con patrones de diseño óptimos.
+
+19. Generación y Modificación de Código
+    19.1. Desarrollar modelos de generación de código basados en aprendizaje automático.
+        19.1.1. Entrenar modelos en grandes conjuntos de código fuente.
+        19.1.2. Implementar técnicas de generación de código condicional.
+    19.2. Implementar herramientas para modificar el código existente.
+        19.2.1. Desarrollar un editor de código asistido por IA.
+        19.2.2. Crear herramientas para realizar refactorizaciones automáticas.
+    19.3. Desarrollar la capacidad de la IA para proponer y aplicar cambios en su propio código.
+        19.3.1. Generar parches de código para corregir errores o mejorar el rendimiento.
+        19.3.2. Evaluar la corrección y el impacto de los cambios propuestos.
+
+20. Meta-aprendizaje y Optimización de Algoritmos
+    20.1. Investigar técnicas de meta-aprendizaje.
+        20.1.1. Estudiar cómo aprender a aprender.
+        20.1.2. Estudiar cómo optimizar algoritmos de aprendizaje.
+    20.2. Desarrollar la capacidad de la IA para seleccionar y optimizar sus propios algoritmos.
+        20.2.1. Implementar algoritmos de optimización bayesiana o algoritmos genéticos para la selección de modelos.
+        20.2.2. Desarrollar técnicas para ajustar hiperparámetros automáticamente.
+    20.3. Permitir que la IA aprenda nuevos algoritmos.
+        20.3.1. Explorar el aprendizaje de algoritmos a partir de ejemplos o descripciones.
+
+21. Evolución de la Arquitectura
+    21.1. Investigar técnicas de búsqueda neuronal de arquitectura (NAS).
+        21.1.1. Estudiar cómo encontrar arquitecturas de redes neuronales óptimas automáticamente.
+    21.2. Desarrollar la capacidad de la IA para modificar su propia arquitectura.
+        21.2.1. Implementar mecanismos para añadir, eliminar o modificar módulos.
+        21.2.2. Permitir que la IA experimente con diferentes configuraciones de módulos.
+    21.3. Implementar un proceso de evolución artificial.
+        21.3.1. Definir una "aptitud" para diferentes arquitecturas.
+        21.3.2. Utilizar algoritmos evolutivos para explorar el espacio de arquitecturas posibles.
+
+22. Entorno Seguro para la Auto-modificación
+    22.1. Crear un entorno de "sandbox" aislado para probar cambios en el código.
+        22.1.1. Virtualizar o contener la ejecución del código modificado.
+        21.2.2. Limitar el acceso a recursos externos durante las pruebas.
+    22.2. Desarrollar un sistema de pruebas automatizadas exhaustivo para cambios auto-generados.
+        22.2.1. Generar casos de prueba automáticamente.
+        22.2.2. Validar la corrección y el rendimiento de los cambios.
+    22.3. Implementar un mecanismo de reversión segura.
+        22.3.1. Permitir que la IA revierta a una versión anterior si un cambio introduce errores o problemas.
+
+## Fase 5: Mejora de la Interacción Natural y Multimodal
+
+Lograr una interacción fluida, natural y contextual a través de múltiples modalidades.
+
+23. Comprensión Avanzada del Lenguaje Natural (NLU)
+    23.1. Mejorar la precisión en la detección de intenciones y entidades.
+        23.1.1. Utilizar modelos de PNL de última generación.
+        23.1.2. Entrenar modelos en conjuntos de datos específicos del dominio del proyecto.
+    23.2. Desarrollar la comprensión de sarcasmo, ironía y otros matices lingüísticos.
+        23.2.1. Explorar el análisis del sentimiento y el tono.
+        23.2.2. Desarrollar modelos que consideren el contexto y la historia de la conversación.
+    23.3. Implementar el análisis del discurso y la estructura conversacional.
+        23.3.1. Identificar los diferentes turnos y actos de habla.
+        23.3.2. Comprender las relaciones entre diferentes partes de una conversación.
+
+24. Generación Avanzada del Lenguaje Natural (NLG)
+    24.1. Generar respuestas coherentes, relevantes y naturales.
+        24.1.1. Utilizar modelos generativos de texto (ej. Transformers).
+        24.1.2. Afinar los modelos en conjuntos de datos conversacionales.
+    24.2. Adaptar el estilo y el tono de la respuesta al usuario y al contexto.
+        24.2.1. Desarrollar "perfiles de usuario" para personalizar la comunicación.
+        24.2.2. Ajustar la formalidad, la complejidad y el nivel de detalle.
+    24.3. Generar texto creativo y variado.
+        24.3.1. Explorar la generación de historias, poemas u otros tipos de texto creativo.
+        24.3.2. Evitar respuestas repetitivas o genéricas.
+
+25. Interacción Multimodal
+    25.1. Integrar capacidades de procesamiento de voz.
+        25.1.1. Implementar reconocimiento automático de voz (ASR).
+        25.1.2. Implementar síntesis de voz (TTS) con voces naturales.
+        25.1.3. Desarrollar la capacidad de entender el tono y la emoción en la voz.
+    25.2. Integrar capacidades de procesamiento de imágenes y visión artificial.
+        25.2.1. Implementar detección de objetos, reconocimiento facial (opcional y con consideraciones éticas/privacidad).
+        25.2.2. Permitir que la IA "vea" y describa imágenes.
+        25.2.3. Utilizar información visual para complementar la comprensión textual o verbal.
+    25.3. Combinar información de diferentes modalidades.
+        25.3.1. Desarrollar modelos que puedan procesar y fusionar datos de texto, audio e imágenes.
+        25.3.2. Permite que la IA responda de forma multimodal (ej. texto + imagen).
+
+26. Gestión del Diálogo y el Estado Conversacional
+    26.1. Desarrollar un sistema robusto de gestión del diálogo.
+        26.1.1. Rastrea el estado actual de la conversación.
+        26.1.2. Gestiona las preguntas abiertas y los turnos de conversación.
+    26.2. Manejar interrupciones y cambios de tema.
+        26.2.1. Desarrollar la capacidad de identificar cuándo el usuario cambia de tema.
+        26.2.2. Implementar mecanismos para manejar interrupciones de forma elegante.
+    26.3. Mantener la coherencia a largo plazo en las conversaciones.
+        26.3.1. Recordar detalles de conversaciones anteriores.
+        26.3.2. Referenciar información previamente discutida de forma natural.
+
+27. Desarrollo de la Personalidad y el Estilo de Comunicación
+    27.1. Refinar el módulo `core/personality.py`.
+        27.1.1. Ampliar los parámetros que definen la personalidad.
+        27.1.2. Permitir la personalización de la personalidad (con límites éticos).
+    27.2. Desarrollar la capacidad de la IA para adaptar su estilo de comunicación.
+        27.2.1. Ajustar el nivel de formalidad, el uso de jerga, etc.
+        27.2.2. Mostrar empatía y comprensión emocional en las respuestas.
+    27.3. Mantener la consistencia de la personalidad a lo largo del tiempo y las interacciones.
+
+28. Interfaces de Usuario Avanzadas
+    28.1. Mejorar los bots existentes (`bots/`).
+        28.1.1. Añadir funcionalidades específicas de la plataforma (Discord, Telegram, CLI).
+        28.1.2. Mejorar la usabilidad y la respuesta de los bots.
+    28.2. Desarrollar una interfaz web o de aplicación dedicada.
+        28.2.1. Crear una interfaz gráfica intuitiva para interactuar con la IA.
+        28.2.2. Permitir la interacción multimodal a través de la interfaz.
+    28.3. Explorar interfaces alternativas (ej. realidad virtual, realidad aumentada).
+        28.3.1. Diseñar cómo interactuaría la IA en entornos inmersivos.
+
+## Fase 6: Integración con Hardware y el Entorno
+
+Permitir que la IA interactúe directamente con el mundo físico y digital más allá de las interfaces de usuario tradicionales.
+
+29. Desarrollo de Drivers y APIs de Hardware
+    29.1. Investigar y seleccionar plataformas de hardware compatibles.
+        29.1.1. Identificar tipos de sensores y actuadores relevantes (ej. cámaras, micrófonos, brazos robóticos).
+        29.1.2. Evaluar plataformas robóticas o de IoT.
+    29.2. Desarrollar o adaptar drivers para interactuar con hardware específico.
+        29.2.1. Escribir código para leer datos de sensores.
+        29.2.2. Escribir código para controlar actuadores.
+    29.3. Crear una capa de abstracción de hardware (`core/hardware.py` avanzado).
+        29.3.1. Diseñar una interfaz genérica para diferentes tipos de hardware.
+        29.3.2. Permitir que la IA interactúe con hardware sin conocer los detalles de bajo nivel.
+
+30. Percepción del Entorno
+    30.1. Integrar datos de sensores para construir una representación del entorno.
+        30.1.1. Procesar datos de cámaras (visión artificial).
+        30.1.2. Procesar datos de micrófonos (reconocimiento de sonido, localización).
+        30.1.3. Integrar datos de otros sensores (ej. temperatura, distancia).
+    30.2. Desarrollar un modelo dinámico del entorno.
+        30.2.1. Mantener un mapa o representación del espacio físico.
+        30.2.2. Rastrear la posición y el estado de objetos y personas.
+    30.3. Filtrar y fusionar datos de múltiples sensores.
+        30.3.1. Utilizar técnicas de filtrado (ej. Kalman filters).
+        30.3.2. Combinar información de diferentes modalidades sensoriales.
+
+31. Actuación y Control Físico
+    31.1. Desarrollar la capacidad de planificar acciones en el entorno físico.
+        31.1.1. Implementar algoritmos de planificación de movimiento para robots.
+        31.1.2. Considerar obstáculos y restricciones físicas.
+    31.2. Implementar el control de actuadores.
+        31.2.1. Enviar comandos a brazos robóticos, ruedas, etc.
+        31.2.2. Desarrollar controladores para ejecutar movimientos precisos.
+    31.3. Desarrollar la retroalimentación de la actuación.
+        31.3.1. Utilizar sensores para verificar si una acción se ejecutó correctamente.
+        31.3.2. Ajustar la planificación o el control en función de la retroalimentación.
+
+32. Interacción con el Entorno Digital
+    32.1. Desarrollar la capacidad de navegar e interactuar con interfaces digitales (web, aplicaciones).
+        32.1.1. Implementar reconocimiento de elementos de UI.
+        32.1.2. Desarrollar mecanismos para simular clics, escritura, etc.
+    32.2. Integrar APIs de servicios web.
+        32.2.1. Desarrollar clientes para interactuar con servicios externos (ej. búsqueda, clima, noticias).
+        32.2.2. Procesar y utilizar los datos obtenidos de las APIs.
+    32.3. Automatizar tareas en entornos digitales.
+        32.3.1. Desarrollar la capacidad de realizar flujos de trabajo complejos en línea.
+        32.3.2. Interactuar con sistemas de archivos, bases de datos, etc.
+
+33. Robótica Avanzada
+    33.1. Integrar la IA con plataformas robóticas complejas.
+        33.1.1. Utilizar frameworks de robótica (ej. ROS).
+        33.1.2. Desarrollar aplicaciones de percepción, planificación y control específicas para robots.
+    33.2. Desarrollar la capacidad de manipulación de objetos.
+        33.2.1. Implementar reconocimiento de objetos para agarre.
+        33.2.2. Desarrollar algoritmos de planificación de agarre.
+    33.3. Implementar navegación autónoma en entornos complejos.
+        33.3.1. Desarrollar algoritmos de localización y mapeo simultáneo (SLAM).
+        33.3.2. Planificar rutas y evitar obstáculos de forma autónoma.
+
+34. Telepresencia y Control Remoto Asistido por IA
+    34.1. Desarrollar interfaces para el control remoto de la IA o de hardware conectado.
+        34.1.1. Permitir que los operadores humanos guíen a la IA en tareas físicas o digitales.
+    34.2. Implementar asistencia de IA para operadores remotos.
+        34.2.1. Proporcionar información contextual a los operadores.
+        34.2.2. Sugerir acciones o planes.
+    34.3. Desarrollar la capacidad de aprender de la interacción y el control humano.
+
+## Fase 7: Escalado y Optimización del Swarm
+
+Escalar la arquitectura a un sistema distribuido de agentes colaborativos y optimizar su funcionamiento.
+
+35. Arquitectura del Swarm Distribuido
+    35.1. Diseñar la arquitectura para un swarm de agentes autónomos (`core/swarm.py` avanzado).
+        35.1.1. Definir los roles y responsabilidades de los diferentes tipos de agentes.
+        35.1.2. Diseñar cómo se comunican y coordinan los agentes.
+    35.2. Implementar un framework de agentes.
+        35.2.1. Seleccionar o desarrollar una plataforma para ejecutar y gestionar agentes.
+        35.2.2. Implementar la lógica básica para la creación, gestión y terminación de agentes.
+    35.3. Desplegar el swarm en infraestructura distribuida.
+        35.3.1. Utilizar sistemas de orquestación (ej. Kubernetes).
+        35.3.2. Escalar el número de agentes según la carga de trabajo.
+
+36. Comunicación y Coordinación entre Agentes
+    36.1. Desarrollar protocolos de comunicación eficientes y seguros.
+        36.1.1. Definir el formato de los mensajes entre agentes.
+        36.1.2. Implementar cifrado y autenticación para la comunicación.
+    36.2. Implementar mecanismos

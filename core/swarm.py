@@ -1,3 +1,236 @@
+# --- Enjambre Real: Descubrimiento y Sincronización Ligera entre Nodos ---
+import socket
+import threading
+import time
+
+class SwarmNetworkNode:
+    """
+    Nodo de enjambre real: anuncia su presencia y sincroniza conocimiento con otros nodos en la LAN.
+    """
+    BROADCAST_PORT = 50505
+    SYNC_PORT = 50506
+    BROADCAST_INTERVAL = 5  # segundos
+    TIMEOUT = 15  # segundos para considerar un nodo inactivo
+
+    def __init__(self, node_id, knowledge_path):
+        self.node_id = node_id
+        self.knowledge_path = knowledge_path  # Ej: 'config/responses.json'
+        self.neighbors = {}  # node_id: (ip, last_seen)
+        self.running = False
+        self._lock = threading.Lock()
+
+    def start(self):
+        self.running = True
+        threading.Thread(target=self._broadcast_presence, daemon=True).start()
+        threading.Thread(target=self._listen_broadcasts, daemon=True).start()
+        threading.Thread(target=self._listen_sync_requests, daemon=True).start()
+        threading.Thread(target=self._prune_neighbors, daemon=True).start()
+
+    def stop(self):
+        self.running = False
+
+    def _broadcast_presence(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        msg = f"MEA-CORE-NODE:{self.node_id}"
+        while self.running:
+            s.sendto(msg.encode(), ("<broadcast>", self.BROADCAST_PORT))
+            time.sleep(self.BROADCAST_INTERVAL)
+
+    def _listen_broadcasts(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(("", self.BROADCAST_PORT))
+        while self.running:
+            try:
+                data, addr = s.recvfrom(1024)
+                msg = data.decode()
+                if msg.startswith("MEA-CORE-NODE:"):
+                    node_id = msg.split(":",1)[1]
+                    if node_id != self.node_id:
+                        with self._lock:
+                            self.neighbors[node_id] = (addr[0], time.time())
+            except Exception:
+                continue
+
+    def _listen_sync_requests(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(("", self.SYNC_PORT))
+        s.listen(5)
+        while self.running:
+            try:
+                conn, addr = s.accept()
+                threading.Thread(target=self._handle_sync, args=(conn,), daemon=True).start()
+            except Exception:
+                continue
+
+    def _handle_sync(self, conn):
+        try:
+            with open(self.knowledge_path, "rb") as f:
+                data = f.read()
+            conn.sendall(data)
+        except Exception:
+            pass
+        finally:
+            conn.close()
+
+    def _prune_neighbors(self):
+        while self.running:
+            now = time.time()
+            with self._lock:
+                to_remove = [nid for nid,(_,last) in self.neighbors.items() if now-last > self.TIMEOUT]
+                for nid in to_remove:
+                    del self.neighbors[nid]
+            time.sleep(5)
+
+    def sync_with_neighbors(self):
+        """Solicita el archivo de conocimiento a todos los vecinos y lo fusiona (simplemente reemplaza si es más reciente)."""
+        for node_id, (ip, _) in list(self.neighbors.items()):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(3)
+                s.connect((ip, self.SYNC_PORT))
+                data = b""
+                while True:
+                    chunk = s.recv(4096)
+                    if not chunk:
+                        break
+                    data += chunk
+                s.close()
+                # Guardar si es diferente (puedes mejorar con timestamps/versiones)
+                with open(self.knowledge_path, "rb") as f:
+                    local = f.read()
+                if data and data != local:
+                    with open(self.knowledge_path, "wb") as f:
+                        f.write(data)
+                    print(f"[SwarmNetwork] Sincronizado conocimiento desde {node_id} ({ip})")
+            except Exception:
+                continue
+# --- Simulación de Enjambre Virtual (Inspirado en el simulador HTML) ---
+import random
+
+class SwarmNode:
+    """
+    Nodo virtual del enjambre, simula un agente MEA-Core en la red.
+    """
+    def __init__(self, node_id, lan_device, priority=1, bandwidth=None):
+        self.id = node_id
+        self.lan_device = lan_device
+        self.priority = priority
+        self.status = 'activo'  # 'activo', 'replicando', 'offline'
+        self.cpu = random.randint(10, 60)
+        self.memory = random.randint(20, 70)
+        self.bandwidth = bandwidth if bandwidth else random.uniform(50, 150)  # Mbps
+        self.children = []
+        self.data = []
+        self.network_load = 0.0
+        self.fail_chance = 0.005
+
+    def __repr__(self):
+        return f"<SwarmNode {self.id} ({self.lan_device}) {self.status}>"
+
+class SwarmNetwork:
+    """
+    Red virtual de enjambre, gestiona nodos, replicación, fallos y reconexión.
+    """
+    LAN_DEVICES = ['Servidor','PC','Laptop','Tablet','RaspberryPi','NAS','Router','IoT']
+
+    def __init__(self, node_count=15):
+        self.nodes = []
+        self.replication_history = []
+        self.alerts = []
+        self._create_nodes(node_count)
+        self._build_topology()
+
+    def _create_nodes(self, node_count):
+        for i in range(node_count):
+            dev = random.choice(self.LAN_DEVICES)
+            priority = {'Servidor':5,'PC':4,'Laptop':3,'NAS':4,'Router':2}.get(dev,1)
+            node = SwarmNode(f"Nodo-{i+1}", dev, priority)
+            self.nodes.append(node)
+
+    def _build_topology(self):
+        hubs = [n for n in self.nodes if n.priority >= 4]
+        for n in self.nodes:
+            if n not in hubs:
+                hub = random.choice(hubs)
+                hub.children.append(n)
+
+    def replicate(self, node1, node2):
+        if node1.status == 'replicando' or node2.status == 'replicando':
+            return
+        # Pérdida de paquetes
+        if random.random() < 0.05:
+            self.alerts.append(f"Paquete perdido entre {node1.id} y {node2.id}")
+            return
+        # Latencia y saturación
+        avg_bw = (node1.bandwidth + node2.bandwidth) / 2
+        network_factor = 1 + min(node1.network_load,1) + min(node2.network_load,1)
+        latency = max(100, (5000/avg_bw) * network_factor)
+        node1.status = node2.status = 'replicando'
+        node1.network_load += 0.3
+        node2.network_load += 0.3
+        is_critical = random.random() < (max(node1.priority, node2.priority)/5)
+        new_data = f"{'CRITICAL' if is_critical else 'Data'}-{random.randint(0,999)}"
+        node1.data.append(new_data)
+        node2.data.append(new_data)
+        node1.data = node1.data[-20:]
+        node2.data = node2.data[-20:]
+        self.replication_history.append(f"{node1.id}<->{node2.id} intercambiaron {new_data} (lat {int(latency)}ms)")
+        # Simular fin de replicación
+        def finish():
+            node1.status = node2.status = 'activo'
+            node1.cpu += random.uniform(0,5)
+            node2.cpu += random.uniform(0,5)
+            node1.memory += random.uniform(0,5)
+            node2.memory += random.uniform(0,5)
+            node1.network_load = max(0, node1.network_load-0.3)
+            node2.network_load = max(0, node2.network_load-0.3)
+        # En entorno real usarías threading/timers, aquí solo lógica directa
+        finish()
+
+    def step(self, replication_speed=0.03, connection_radius=150):
+        # Simula un paso de la red: movimiento, fallos, replicación, reconexión
+        for node in self.nodes:
+            # Fallo aleatorio
+            if random.random() < node.fail_chance:
+                node.status = 'offline'
+            # Reconexión automática
+            if node.status == 'offline' and random.random() < 0.02:
+                node.status = 'activo'
+        # Replicación entre hubs y sus hijos
+        for hub in [n for n in self.nodes if n.children]:
+            for child in hub.children:
+                if random.random() < replication_speed and hub.network_load<1 and child.network_load<1 and hub.status=='activo' and child.status=='activo':
+                    self.replicate(hub, child)
+        # Replicación mesh (todos con todos dentro de radio)
+        for i, n1 in enumerate(self.nodes):
+            for n2 in self.nodes[i+1:]:
+                if n1.status=='activo' and n2.status=='activo' and n1.network_load<1 and n2.network_load<1:
+                    if random.random() < replication_speed/2:
+                        self.replicate(n1, n2)
+
+    def get_status(self):
+        # Devuelve un resumen del enjambre para mostrar en GUI/log
+        return [{
+            'id': n.id,
+            'lan_device': n.lan_device,
+            'status': n.status,
+            'cpu': int(n.cpu),
+            'memory': int(n.memory),
+            'data_count': len(n.data),
+            'bandwidth': int(n.bandwidth),
+            'network_load': round(n.network_load,2),
+            'priority': n.priority,
+            'children': len(n.children)
+        } for n in self.nodes]
+
+    def get_replication_history(self, limit=20):
+        return self.replication_history[-limit:][::-1]
+
+    def get_alerts(self, limit=10):
+        return self.alerts[-limit:][::-1]
 import os
 import shutil
 import uuid

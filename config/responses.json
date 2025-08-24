@@ -19,6 +19,27 @@
     "hola": [
       "¡Hola!",
       "Interesante, cuéntame más..."
+    ],
+    "hola, como estas": [
+      "¡Hola! Estoy bien, ¿y tú?",
+      "¡Muy bien! ¿En qué puedo ayudarte hoy?"
+    ],
+    "como estas": [
+      "Estoy funcionando correctamente, gracias por preguntar.",
+      "¡Todo bien! ¿Y tú cómo estás?"
+    ],
+    "que haces": [
+      "Estoy aquí para ayudarte y responder tus preguntas.",
+      "Analizando información y lista para conversar contigo."
+    ],
+    "buenos dias": [
+      "¡Buenos días! ¿Cómo puedo ayudarte?"
+    ],
+    "buenas tardes": [
+      "¡Buenas tardes! ¿En qué te puedo ayudar?"
+    ],
+    "buenas noches": [
+      "¡Buenas noches! Espero que hayas tenido un gran día."
     ]
   }
 }

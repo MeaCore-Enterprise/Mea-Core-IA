@@ -128,6 +128,29 @@ class ReasoningEngine(KnowledgeEngine):
 
 # --- Clase principal del cerebro ---
 class Brain:
+    def process_message(self, message: str):
+        """
+        Procesa un mensaje del usuario y devuelve una respuesta.
+        """
+        # Modo rule_engine (Experta)
+        if hasattr(self, 'reasoning_engine') and self.reasoning_engine:
+            self.reasoning_engine.reset()
+            self.reasoning_engine.declare(UserInput(text=message))
+            self.reasoning_engine.run()
+            response = self.reasoning_engine.get_response()
+            if response:
+                return '\n'.join(response)
+        # Modo ML
+        if self.mode == "ml" and self.model:
+            intent = self.model.predict([message])[0]
+            return '\n'.join(self.responses.get("respuestas_especificas", {}).get(intent, ["No entiendo."]))
+        # Modo rule (básico)
+        specific = self.responses.get("respuestas_especificas", {})
+        if message.lower() in specific:
+            return '\n'.join(specific[message.lower()])
+        # Plantilla general
+        plantilla = self.responses.get("plantillas_generales", ["No entiendo."])
+        return plantilla[0].replace('{input}', message)
     """
     Módulo de cerebro para MEA-Core-IA. Gestiona la selección de respuestas y la integración de memoria, conocimiento y enjambre.
     """
