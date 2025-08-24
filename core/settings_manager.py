@@ -5,17 +5,29 @@ SETTINGS_PATH = "config/settings.json"
 RESPONSES_PATH = "config/responses.json"
 
 class SettingsManager:
-    """
-    Gestiona la carga y guardado de la configuración y respuestas del bot.
+    """Gestiona la carga y el guardado de archivos de configuración JSON.
+
+    Esta clase centraliza el acceso a los archivos de configuración principales
+    del proyecto, como `settings.json` y `responses.json`.
     """
     def __init__(self, settings_path: str = SETTINGS_PATH, responses_path: str = RESPONSES_PATH):
+        """Inicializa el gestor de configuración.
+
+        Args:
+            settings_path (str): Ruta al archivo de configuración principal.
+            responses_path (str): Ruta al archivo de respuestas del bot.
+        """
         self.settings_path = settings_path
         self.responses_path = responses_path
         self.settings = self._load_settings()
         self.responses = self._load_responses()
 
     def _load_settings(self) -> Dict[str, Any]:
-        """Carga el archivo de configuración."""
+        """(Privado) Carga el archivo de configuración desde la ruta especificada.
+
+        Returns:
+            Dict[str, Any]: Un diccionario con la configuración o un diccionario vacío si falla.
+        """
         try:
             with open(self.settings_path, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -24,7 +36,11 @@ class SettingsManager:
             return {}
 
     def _load_responses(self) -> Dict[str, Any]:
-        """Carga el archivo de respuestas."""
+        """(Privado) Carga el archivo de respuestas desde la ruta especificada.
+
+        Returns:
+            Dict[str, Any]: Un diccionario con las respuestas o un diccionario vacío si falla.
+        """
         try:
             with open(self.responses_path, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -33,15 +49,35 @@ class SettingsManager:
             return {}
 
     def get_setting(self, key: str, default: Any = None) -> Any:
-        """Obtiene un valor de la configuración."""
+        """Obtiene un valor de la configuración por su clave.
+
+        Args:
+            key (str): La clave a buscar en la configuración.
+            default (Any, optional): El valor a devolver si la clave no se encuentra. Defaults to None.
+
+        Returns:
+            Any: El valor asociado a la clave, o el valor por defecto.
+        """
         return self.settings.get(key, default)
 
     def get_responses(self) -> Dict[str, Any]:
-        """Obtiene el diccionario de respuestas."""
+        """Obtiene el diccionario completo de respuestas.
+
+        Returns:
+            Dict[str, Any]: El diccionario de respuestas.
+        """
         return self.responses
 
     def set_value(self, key_path: str, value: Any):
-        """Establece un valor en una ruta de claves anidadas (ej. 'swarm.replication_enabled')."""
+        """Establece un valor en la configuración usando una ruta de claves anidadas.
+
+        Permite modificar valores anidados especificando la ruta con puntos.
+        Ejemplo: `set_value('swarm.replication_enabled', True)`
+
+        Args:
+            key_path (str): La ruta de claves anidadas, separadas por puntos.
+            value (Any): El nuevo valor a establecer.
+        """
         keys = key_path.split('.')
         data = self.settings
         for key in keys[:-1]:
@@ -50,7 +86,10 @@ class SettingsManager:
         self._save_settings()
 
     def _save_settings(self):
-        """Guarda la configuración actual en el archivo JSON."""
+        """(Privado) Guarda la configuración actual en el archivo JSON.
+
+        La configuración se guarda con una indentación de 2 espacios para legibilidad.
+        """
         try:
             with open(self.settings_path, "w", encoding="utf-8") as f:
                 json.dump(self.settings, f, indent=2)
