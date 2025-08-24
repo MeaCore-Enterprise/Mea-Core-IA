@@ -41,7 +41,7 @@ class MemoryStore:
         """Devuelve el identificador único de esta instancia de MemoryStore."""
         return self._instance_id
 
-    def add_memory(self, content: str, meta: Dict = None, long_term: bool = False):
+    def add_memory(self, content: str, meta: Dict = None, long_term: bool = False) -> Dict:
         """Añade un recuerdo a la memoria a corto o largo plazo.
 
         Args:
@@ -49,13 +49,50 @@ class MemoryStore:
             meta (Dict, optional): Metadatos asociados al recuerdo. Defaults to None.
             long_term (bool, optional): Si es True, lo guarda en memoria a largo plazo.
                                       Defaults to False (corto plazo).
+        
+        Returns:
+            Dict: El item de memoria creado, incluyendo su nuevo ID.
         """
-        item = {'content': content, 'meta': meta or {}, 'timestamp': time.time()}
+        item = {
+            'id': str(uuid.uuid4()),
+            'content': content,
+            'meta': meta or {},
+            'timestamp': time.time()
+        }
         if long_term:
             self.long_term.append(item)
         else:
             self.short_term.append(item)
         self._update_lru(content, item)
+        return item
+
+    def delete_memory(self, memory_id: str) -> bool:
+        """Elimina un recuerdo específico de la memoria por su ID.
+
+        Busca tanto en la memoria a corto como a largo plazo.
+
+        Args:
+            memory_id (str): El ID único del recuerdo a eliminar.
+
+        Returns:
+            bool: True si el recuerdo fue encontrado y eliminado, False en caso contrario.
+        """
+        # Buscar y eliminar en memoria a largo plazo
+        initial_len = len(self.long_term)
+        self.long_term = [m for m in self.long_term if m.get('id') != memory_id]
+        if len(self.long_term) != initial_len:
+            return True
+
+        # Buscar y eliminar en memoria a corto plazo
+        initial_len = len(self.short_term)
+        self.short_term = collections.deque(
+            (m for m in self.short_term if m.get('id') != memory_id),
+            maxlen=self.short_term.maxlen
+        )
+        if len(self.short_term) != initial_len:
+            return True
+
+        return False
 
     def _update_lru(self, key: str, value: Any):
         """(Privado) Actualiza la caché LRU con el último elemento accedido."""
