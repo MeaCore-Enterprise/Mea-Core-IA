@@ -3,6 +3,7 @@
 import collections
 import time
 import uuid
+import json
 from typing import Any, Dict, List, Tuple
 
 class MemoryStore:
@@ -28,14 +29,22 @@ class MemoryStore:
         self._instance_id = str(uuid.uuid4())
 
     def log_conversation(self, user_input: str, bot_output: list):
-        """Registra una interacción completa (usuario y bot) en la memoria a corto plazo.
+        """Registra una interacción completa como un evento estructurado.
+
+        Guarda un único recuerdo en la memoria a corto plazo con metadatos que
+        lo identifican como un evento de tipo 'conversación'. El contenido
+        es un JSON con la entrada del usuario y la salida del bot.
 
         Args:
             user_input (str): La entrada del usuario.
             bot_output (list): La respuesta del bot (como lista de cadenas).
         """
-        self.add_memory(f"User: {user_input}", long_term=False)
-        self.add_memory(f"Bot: {' | '.join(bot_output)}", long_term=False)
+        event_content = json.dumps({
+            'user': user_input,
+            'bot': bot_output
+        })
+        meta = {'type': 'event', 'event_type': 'conversation'}
+        self.add_memory(event_content, meta=meta, long_term=False)
 
     def get_instance_id(self) -> str:
         """Devuelve el identificador único de esta instancia de MemoryStore."""
