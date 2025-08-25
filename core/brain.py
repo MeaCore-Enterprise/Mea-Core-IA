@@ -9,7 +9,8 @@ from core.knowledge_base import KnowledgeBase
 from core.evolution import ActiveLearningModule
 from core.goals import GoalManager
 from core.memory_store import MemoryStore
-from core.swarm_controller import SwarmController
+# Importar el controlador de replicación con su nuevo nombre
+from core.replication_controller import ReplicationController
 
 # Intentar importar scikit-learn y manejar el fallo si no está instalado
 try:
@@ -123,82 +124,38 @@ class ReasoningEngine(KnowledgeEngine):
 
 # --- Fin de la Integración del Motor de Reglas ---
 
-
-
-
 # --- Clase principal del cerebro ---
 class Brain:
-    def process_message(self, message: str):
-        """
-        Procesa un mensaje del usuario y devuelve una respuesta.
-        """
-        # Modo rule_engine (Experta)
-        if hasattr(self, 'reasoning_engine') and self.reasoning_engine:
-            self.reasoning_engine.reset()
-            self.reasoning_engine.declare(UserInput(text=message))
-            self.reasoning_engine.run()
-            response = self.reasoning_engine.get_response()
-            if response:
-                return '\n'.join(response)
-        # Modo ML
-        if self.mode == "ml" and self.model:
-            intent = self.model.predict([message])[0]
-            return '\n'.join(self.responses.get("respuestas_especificas", {}).get(intent, ["No entiendo."]))
-        # Modo rule (básico)
-        specific = self.responses.get("respuestas_especificas", {})
-        if message.lower() in specific:
-            return '\n'.join(specific[message.lower()])
-        # Plantilla general
-        plantilla = self.responses.get("plantillas_generales", ["No entiendo."])
-        return plantilla[0].replace('{input}', message)
     """
     Módulo de cerebro para MEA-Core-IA. Gestiona la selección de respuestas y la integración de memoria, conocimiento y enjambre.
     """
     def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any],
                  memory: Optional[MemoryStore] = None,
                  knowledge_base: Optional[KnowledgeBase] = None,
-                 swarm_controller: Optional[SwarmController] = None):
+                 replication_controller: Optional[ReplicationController] = None):
         self.settings = settings
         self.mode = self.settings.get("brain", {}).get("mode", "rule_engine")
         self.responses = responses
         self.model = None
         self.memory = memory or MemoryStore()
         self.knowledge_base = knowledge_base or KnowledgeBase([])
-        self.swarm_controller = swarm_controller or SwarmController(node_id="default")
+        self.replication_controller = replication_controller or ReplicationController(settings, self.memory)
         self.learning_module = ActiveLearningModule()
         self.goal_manager = GoalManager(self.memory)
 
         # Módulos de consolidación de memoria y motor de reglas dinámicas
         self.memory_consolidator = MemoryConsolidator()
         self.rules_engine = RulesEngine()
-    # --- Consolidación de Memoria ---
-    def resumir_conversacion(self, texto: str) -> str:
-        return self.memory_consolidator.summarize_conversation(texto)
-
-    def extraer_entidades(self, texto: str):
-        self.memory_consolidator.extract_entities(texto)
-        return self.memory_consolidator.get_entities()
-
-    # --- Motor de Reglas Dinámicas ---
-    def aplicar_reglas(self, texto: str) -> str:
-        return self.rules_engine.apply(texto)
-
-    def agregar_regla(self, condicion: str, accion: str):
-        self.rules_engine.add_rule(condicion, accion)
-
-    def listar_reglas(self):
-        return self.rules_engine.list_rules()
 
         if self.mode == "rule_engine" and EXPERTA_AVAILABLE:
             self.reasoning_engine = ReasoningEngine(self.responses, self)
             print("[Cerebro] Modo 'rule_engine' activado con Experta.")
         else:
-            # Fallback a modo 'rule' si experta no está disponible
             self.reasoning_engine = None
-            self.mode = "rule"
-            if EXPERTA_AVAILABLE:
+            if self.mode == 'rule_engine':
                 print("[Advertencia] Experta no está instalado. Cambiando a modo 'rule'.")
                 print("Para usar el modo 'rule_engine', ejecuta: pip install experta")
+                self.mode = "rule"
 
         if self.mode == "ml" and SKLEARN_AVAILABLE:
             self._train_model()
@@ -233,7 +190,7 @@ class Brain:
 
     def get_response(self, user_input: str, context: Optional[List[str]] = None) -> List[str]:
         """
-        Obtiene una respuesta de la fuente más apropiada: Motor de Reglas, KB, ML, o General.
+        Obtiene una respuesta de la fuente más apropiada: Motor de Reglas, Memoria, KB, ML, o General.
         """
         user_input_lower = user_input.lower()
 
@@ -246,24 +203,38 @@ class Brain:
             if rule_response:
                 return rule_response
 
-        # 2. Consultar la base de conocimiento (si no es un saludo/despedida)
         common_phrases = list(self.responses.get("saludos", [])) + list(self.responses.get("despedidas", []))
         if user_input_lower not in common_phrases:
+            # 2. Consultar la memoria contextual
+            memory_results = self.memory.get_memory(query=user_input_lower, context=context, top_n=1)
+            if memory_results:
+                response = ["[Recuerdo Relevante]"]
+                try:
+                    mem_content = json.loads(memory_results[0]['content'])
+                    if 'user' in mem_content and 'bot' in mem_content:
+                         response.append(f"Tú dijiste: '{mem_content['user']}' y yo respondí: '{' '.join(mem_content['bot'])}'")
+                    else:
+                        response.append(memory_results[0]['content'])
+                except (json.JSONDecodeError, TypeError):
+                    response.append(memory_results[0]['content'])
+                return response
+
+            # 3. Consultar la base de conocimiento
             kb_response = self._get_response_from_kb(user_input_lower)
             if kb_response:
                 return kb_response
 
-        # 3. Usar el modelo ML si está activado
+        # 4. Usar el modelo ML si está activado
         if self.mode == "ml" and self.model:
             predicted_intent = self.model.predict([user_input_lower])[0]
             if predicted_intent in self.responses["respuestas_especificas"]:
                 return self.responses["respuestas_especificas"][predicted_intent]
 
-        # 4. Usar el modo 'rule' simple o como fallback
+        # 5. Usar el modo 'rule' simple o como fallback
         if user_input_lower in self.responses.get("respuestas_especificas", {}):
             return self.responses["respuestas_especificas"][user_input_lower]
         
-        # 5. Si no hay respuesta, devolver una plantilla general
+        # 6. Si no hay respuesta, devolver una plantilla general
         plantilla = random.choice(self.responses.get("plantillas_generales", []))
         return [plantilla.format(input=user_input)]
 
@@ -272,3 +243,19 @@ class Brain:
 
     def get_farewell(self) -> str:
         return random.choice(self.responses.get("despedidas", ["Adiós."]))
+
+    def resumir_conversacion(self, texto: str) -> str:
+        return self.memory_consolidator.summarize_conversation(texto)
+
+    def extraer_entidades(self, texto: str):
+        self.memory_consolidator.extract_entities(texto)
+        return self.memory_consolidator.get_entities()
+
+    def aplicar_reglas(self, texto: str) -> str:
+        return self.rules_engine.apply(texto)
+
+    def agregar_regla(self, condicion: str, accion: str):
+        self.rules_engine.add_rule(condicion, accion)
+
+    def listar_reglas(self):
+        return self.rules_engine.list_rules()

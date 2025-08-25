@@ -49,7 +49,6 @@ class MemoryStore:
         """(Privado) Añade nuevas columnas a la tabla si no existen."""
         try:
             cursor = self.conn.cursor()
-            # Comprobar si existe la columna access_count
             cursor.execute("PRAGMA table_info(long_term_memory)")
             columns = [col[1] for col in cursor.fetchall()]
             if 'access_count' not in columns:
@@ -91,7 +90,6 @@ class MemoryStore:
         return self._instance_id
 
     def add_memory(self, content: str, meta: Optional[Dict] = None, long_term: bool = False) -> Dict:
-        """Añade un recuerdo. Si es a largo plazo, lo persiste en la DB."""
         item = {
             'id': str(uuid.uuid4()),
             'content': content,
@@ -147,19 +145,56 @@ class MemoryStore:
         if len(self.lru_cache) > self.lru_cache_size:
             self.lru_cache.popitem(last=False)
 
-    def get_memory(self, query: str) -> List[Dict]:
-        """Busca un recuerdo y actualiza su contador de acceso si es de largo plazo."""
-        results = [m for m in list(self.short_term) + self.long_term if query in m['content']]
+    def get_memory(self, query: str, context: Optional[List[str]] = None, top_n: int = 5) -> List[Dict]:
+        """Busca recuerdos relevantes usando la consulta y el contexto.
+
+        Args:
+            query (str): El texto a buscar.
+            context (Optional[List[str]], optional): Lista de cadenas del contexto reciente.
+            top_n (int, optional): Número de resultados a devolver. Defaults to 5.
+
+        Returns:
+            List[Dict]: Una lista de los recuerdos más relevantes.
+        """
+        all_memories = list(self.short_term) + self.long_term
+        scored_memories = []
+
+        context_tokens = set()
+        if context:
+            for item in context:
+                context_tokens.update(item.lower().split())
+
+        for mem in all_memories:
+            score = 0
+            mem_content_lower = mem['content'].lower()
+            
+            # Puntuación por consulta directa
+            if query.lower() in mem_content_lower:
+                score += 2
+
+            # Puntuación por coincidencia de contexto
+            if context_tokens:
+                mem_tokens = set(mem_content_lower.split())
+                score += len(context_tokens.intersection(mem_tokens))
+
+            if score > 0:
+                scored_memories.append((mem, score))
+
+        # Ordenar por puntuación descendente
+        scored_memories.sort(key=lambda x: x[1], reverse=True)
+
+        # Obtener los mejores resultados
+        results = [mem for mem, score in scored_memories[:top_n]]
+
         for r in results:
             self._update_lru(r['content'], r)
-            # Si el recuerdo es de largo plazo, incrementar su contador de acceso
             if r in self.long_term:
                 r['access_count'] += 1
                 self._increment_access_count_in_db(r['id'])
+        
         return results
 
     def _increment_access_count_in_db(self, memory_id: str):
-        """(Privado) Incrementa el contador de acceso de un recuerdo en la DB."""
         if not self.conn:
             return
         try:
@@ -170,26 +205,12 @@ class MemoryStore:
             print(f"[ERROR] No se pudo actualizar el contador de acceso en la DB: {e}")
 
     def forget_least_relevant(self, n_items: int = 1):
-        """Encuentra y elimina los recuerdos menos relevantes de la memoria a largo plazo.
-
-        La relevancia se mide por el contador de acceso (`access_count`).
-        Los recuerdos con el contador más bajo se consideran menos relevantes.
-
-        Args:
-            n_items (int, optional): El número de recuerdos a olvidar. Defaults to 1.
-        """
         if not self.long_term:
             return
-
-        # Ordenar la memoria a largo plazo por el contador de acceso en orden ascendente
         sorted_memory = sorted(self.long_term, key=lambda item: item.get('access_count', 0))
-
-        # Determinar los items a eliminar
         items_to_forget = sorted_memory[:n_items]
-
         if not items_to_forget:
             return
-
         print(f"[MemoryStore] Olvidando {len(items_to_forget)} recuerdo(s) menos relevante(s)...")
         for item in items_to_forget:
             self.delete_memory(item['id'])
