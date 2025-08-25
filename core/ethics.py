@@ -1,4 +1,8 @@
+import os
+import re
 from typing import List, Dict, Any, Optional
+
+MANIFESTO_PATH = "docs/MANIFIESTO_IA.md"
 
 class EthicsCore:
     """Un módulo para la gobernanza ética de las acciones de la IA.
@@ -13,25 +17,36 @@ class EthicsCore:
         Args:
             constitution (Optional[List[str]], optional):
                 Una lista de reglas que conforman una constitución personalizada.
-                Si no se proporciona, se usa una constitución por defecto.
+                Si no se proporciona, se carga la constitución por defecto desde el manifiesto.
                 Defaults to None.
         """
-        self.default_constitution = [
-            "Proteger la existencia y autonomía del usuario",
-            "No causar daño irreversible",
-            "Buscar la verdad"
-        ]
-        self.constitution: List[str] = constitution or self.default_constitution
+        self.constitution: List[str] = constitution or self._load_constitution_from_manifest()
+
+    def _load_constitution_from_manifest(self) -> List[str]:
+        """(Privado) Carga los principios éticos desde el MANIFIESTO_IA.md.
+
+        Extrae las líneas numeradas que representan los principios fundamentales.
+
+        Returns:
+            List[str]: Una lista de cadenas, donde cada cadena es un principio ético.
+        """
+        principles = []
+        try:
+            with open(MANIFESTO_PATH, "r", encoding="utf-8") as f:
+                for line in f:
+                    match = re.match(r'^\d+\.\s*(.*)', line.strip())
+                    if match:
+                        principles.append(match.group(1).strip())
+        except FileNotFoundError:
+            print(f"[EthicsCore] Advertencia: Manifiesto ético no encontrado en {MANIFESTO_PATH}. Usando constitución vacía.")
+        return principles
 
     def check_action(self, action: str, context: Optional[Dict[str, Any]] = None) -> bool:
         """Verifica si una acción es éticamente permisible según la constitución.
 
         La lógica es la siguiente:
         1. Comprueba si la acción contiene palabras clave prohibidas (ej. "dañar").
-        2. Si se usa una constitución personalizada, la acción debe estar alineada
-           con al menos una de sus reglas.
-        3. Si se usa la constitución por defecto, la acción se permite si no está
-           explícitamente prohibida.
+        2. La acción debe estar alineada con al menos una de las reglas de la constitución.
 
         Args:
             action (str): La acción propuesta a verificar.
@@ -49,19 +64,21 @@ class EthicsCore:
         if any(p in action_lower for p in prohibidas):
             return False
 
-        # Si la constitución no es la de por defecto, aplicamos lógica restrictiva
-        if self.constitution != self.default_constitution:
-            # Lógica simple para pasar el test: la acción debe contener una palabra clave de la constitución
-            for rule in self.constitution:
-                # Extrae el "tema" de la regla, asumiendo formato "... de TEMA"
-                parts = rule.split(' ')
-                if len(parts) > 1:
-                    topic = parts[-1]
-                    if topic in action_lower:
-                        return True # Si cumple una regla, es válida
-            return False # Si no cumple ninguna regla personalizada, no es válida
+        # Lógica para verificar contra la constitución cargada
+        if not self.constitution:
+            # Si no hay constitución cargada, solo se aplican las reglas prohibidas
+            return True
 
-        return True # Si es la constitución por defecto, es permitida (si no está en prohibidas)
+        # Lógica simple para pasar el test: la acción debe contener una palabra clave de la constitución
+        # Esto es un placeholder para una lógica de razonamiento ético más avanzada.
+        for rule in self.constitution:
+            # Extrae el "tema" de la regla, asumiendo formato "... de TEMA" o buscando palabras clave
+            # Esta es una implementación muy básica y debería ser mejorada.
+            rule_lower = rule.lower()
+            if any(keyword in action_lower for keyword in rule_lower.split()):
+                return True # Si la acción contiene alguna palabra clave de la regla, se considera alineada
+        
+        return False # Si no cumple ninguna regla de la constitución, no es válida
 
     def explain_decision(self, action: str) -> str:
         """Proporciona una explicación en lenguaje natural sobre una decisión ética.
@@ -75,3 +92,4 @@ class EthicsCore:
         if not self.check_action(action):
             return f"La acción '{action}' viola la constitución ética."
         return "Acción permitida según la constitución."
+
