@@ -1,5 +1,9 @@
 """
-Modulo de aprendizaje activo y evolución para MEA-Core-IA.
+Módulo de aprendizaje activo y evolución para MEA-Core-IA.
+
+Este módulo implementa un ciclo de aprendizaje activo, donde el modelo de IA
+puede solicitar proactivamente etiquetas para los datos sobre los que tiene
+- más dudas, mejorando así su rendimiento con una mínima intervención humana.
 """
 
 from typing import Any, Dict, List, Tuple
@@ -16,10 +20,20 @@ except ImportError:
     MODAL_AVAILABLE = False
 
 class ActiveLearningModule:
+    """Gestiona el ciclo de aprendizaje activo para un clasificador.
+
+    Utiliza la librería `modAL` para envolver un estimador de `scikit-learn`
+    y permitirle consultar las muestras más informativas para ser etiquetadas.
     """
-    Gestiona el ciclo de aprendizaje activo para mejorar un modelo de clasificación subyacente.
-    """
-    def __init__(self, initial_data: Tuple[np.ndarray, np.ndarray] = None):
+    def __init__(self, initial_data: Optional[Tuple[np.ndarray, np.ndarray]] = None):
+        """Inicializa el módulo de aprendizaje activo.
+
+        Args:
+            initial_data (Optional[Tuple[np.ndarray, np.ndarray]], optional):
+                Una tupla con los datos iniciales (X_initial, y_initial).
+                Si es None o está vacío, se usan datos de ejemplo para evitar fallos.
+                Defaults to None.
+        """
         if not MODAL_AVAILABLE:
             print("[Advertencia] modAL no está instalado. El módulo de aprendizaje activo estará deshabilitado.")
             print("Para usarlo, ejecuta: pip install modal-python")
@@ -50,9 +64,16 @@ class ActiveLearningModule:
         print("[Aprendizaje Activo] Módulo inicializado y listo.")
 
     def get_uncertain_samples(self, n_instances: int = 1) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Obtiene las 'n' muestras del pool sobre las que el modelo tiene más dudas.
-        Devuelve los índices y las muestras en sí.
+        """Obtiene las muestras del pool sobre las que el modelo tiene más dudas.
+
+        Este es el paso de "consulta" (query) en el ciclo de aprendizaje activo.
+
+        Args:
+            n_instances (int, optional): El número de muestras a consultar. Defaults to 1.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: Una tupla que contiene los índices de las
+                                           muestras consultadas y las muestras en sí.
         """
         if not self.learner:
             return np.array([]), np.array([])
@@ -61,12 +82,13 @@ class ActiveLearningModule:
         return query_idx, query_instance
 
     def teach(self, indices: np.ndarray, labels: np.ndarray) -> None:
-        """
-        "Enseña" al learner con nuevas etiquetas para las muestras dudosas.
+        """Enseña al learner con nuevas etiquetas para las muestras consultadas.
+
+        Este es el paso de "enseñanza" en el ciclo de aprendizaje activo.
         
         Args:
-            indices: Los índices de las muestras en el pool que se van a etiquetar.
-            labels: Las etiquetas correctas para esas muestras.
+            indices (np.ndarray): Los índices de las muestras en el pool que se van a etiquetar.
+            labels (np.ndarray): Las etiquetas correctas para esas muestras.
         """
         if not self.learner:
             return
@@ -83,7 +105,14 @@ class ActiveLearningModule:
         print(f"[Aprendizaje Activo] Modelo re-entrenado con {len(labels)} nueva(s) instancia(s).")
 
     def get_model_accuracy(self) -> float:
-        """Calcula la precisión del modelo actual sobre el conjunto de entrenamiento."""
+        """Calcula la precisión del modelo actual sobre su conjunto de entrenamiento.
+
+        Nota: Esta precisión puede ser optimista. Para una evaluación real, se
+        necesitaría un conjunto de test separado.
+
+        Returns:
+            float: La puntuación de precisión del modelo (0.0 a 1.0).
+        """
         if not self.learner:
             return 0.0
         return self.learner.score(self.learner.X_training, self.learner.y_training)
