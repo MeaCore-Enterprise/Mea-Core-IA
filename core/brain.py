@@ -6,10 +6,10 @@ from core.memory_consolidator import MemoryConsolidator
 from core.rules_engine import RulesEngine
 
 from core.knowledge_base import KnowledgeBase
+from core.knowledge_graph import KnowledgeGraph # Importar el nuevo módulo
 from core.evolution import ActiveLearningModule
 from core.goals import GoalManager
 from core.memory_store import MemoryStore
-# Importar el controlador de replicación con su nuevo nombre
 from core.replication_controller import ReplicationController
 
 # Intentar importar scikit-learn y manejar el fallo si no está instalado
@@ -132,6 +132,7 @@ class Brain:
     def __init__(self, settings: Dict[str, Any], responses: Dict[str, Any],
                  memory: Optional[MemoryStore] = None,
                  knowledge_base: Optional[KnowledgeBase] = None,
+                 knowledge_graph: Optional[KnowledgeGraph] = None,
                  replication_controller: Optional[ReplicationController] = None):
         self.settings = settings
         self.mode = self.settings.get("brain", {}).get("mode", "rule_engine")
@@ -139,6 +140,7 @@ class Brain:
         self.model = None
         self.memory = memory or MemoryStore()
         self.knowledge_base = knowledge_base or KnowledgeBase([])
+        self.knowledge_graph = knowledge_graph or KnowledgeGraph()
         self.replication_controller = replication_controller or ReplicationController(settings, self.memory)
         self.learning_module = ActiveLearningModule()
         self.goal_manager = GoalManager(self.memory)
@@ -162,6 +164,13 @@ class Brain:
         elif self.mode == "ml" and not SKLEARN_AVAILABLE:
             print("[Advertencia] scikit-learn no está instalado. Cambiando a modo 'rule'.")
             self.mode = "rule"
+
+    def learn_fact(self, subject: str, relation: str, obj: str):
+        """Aprende un nuevo hecho y lo añade al grafo de conocimiento."""
+        self.knowledge_graph.add_node(subject)
+        self.knowledge_graph.add_node(obj)
+        self.knowledge_graph.add_edge(subject, obj, relation)
+        print(f"[Cerebro] Hecho aprendido: {subject} -> {relation} -> {obj}")
 
     def _train_model(self):
         """Entrena un modelo de clasificación simple con las respuestas específicas."""
@@ -190,7 +199,7 @@ class Brain:
 
     def get_response(self, user_input: str, context: Optional[List[str]] = None) -> List[str]:
         """
-        Obtiene una respuesta de la fuente más apropiada: Motor de Reglas, Memoria, KB, ML, o General.
+        Obtiene una respuesta de la fuente más apropiada: Motor de Reglas, Memoria, Grafo, KB, ML, o General.
         """
         user_input_lower = user_input.lower()
 
