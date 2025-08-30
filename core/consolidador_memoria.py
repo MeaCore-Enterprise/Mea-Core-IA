@@ -40,4 +40,4 @@ class MemoryConsolidator:
         return self.summaries
 
     def get_entities(self):
-        return dict(self.entities)
+        return {k: list(v) for k, v in self.entities.items()}

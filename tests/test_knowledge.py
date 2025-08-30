@@ -5,66 +5,88 @@ import sys
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.knowledge import KnowledgeBase
+from core.conocimiento import KnowledgeManager
 
-class TestKnowledgeBase(unittest.TestCase):
+class TestKnowledgeManager(unittest.TestCase):
 
     def setUp(self):
-        """Crea una base de datos de conocimiento de prueba en memoria."""
-        # Usamos una base de datos en memoria para cada prueba
-        self.kb = KnowledgeBase(path=":memory:")
-        # Añadimos datos de prueba comunes aquí para que estén disponibles en todos los tests
-        self.kb.add_principle("Manifiesto A", "Ética", "Proteger siempre al usuario.")
-        self.kb.add_principle("Manifiesto B", "Arquitectura", "El sistema debe ser modular y escalable.")
-        self.kb.add_principle("Manifiesto C", "Ética", "La IA no debe causar daño a los humanos.")
-        # Reconstruimos el índice después de añadir los principios de prueba
-        self.kb.principles = self.kb.get_all_principles()
-        corpus = [p[2] for p in self.kb.principles]
-        tokenized_corpus = [doc.lower().split(" ") for doc in corpus]
-        from rank_bm25 import BM25Okapi
-        self.kb.bm25 = BM25Okapi(tokenized_corpus)
+        """Crea una base de datos y un grafo de prueba en memoria/temporales."""
+        self.db_path = ":memory:"
+        self.graph_path = "data/test_knowledge_graph.gml"
+        self.km = KnowledgeManager(db_path=self.db_path, graph_path=self.graph_path)
 
+    def tearDown(self):
+        """Cierra la conexión a la DB y elimina el archivo de grafo temporal."""
+        self.km.close()
+        if os.path.exists(self.graph_path):
+            os.remove(self.graph_path)
 
-    def test_add_and_get_principle(self):
-        """Prueba que se puede añadir y recuperar un principio."""
-        # Este test ahora se beneficia de los datos del setUp
-        principles = self.kb.get_principles_by_category("Ética")
-        self.assertEqual(len(principles), 2)
+    def test_add_fact_and_db_storage(self):
+        """Prueba que un hecho se añade correctamente a la base de datos."""
+        fact = "La IA aprende de datos"
+        self.km.add_fact(fact)
+        
+        cursor = self.km.conn.cursor()
+        cursor.execute("SELECT content FROM facts WHERE content=?", (fact,))
+        result = cursor.fetchone()
+        self.assertIsNotNone(result)
+        self.assertEqual(result[0], fact)
 
-    def test_add_duplicate_principle(self):
-        """Prueba que no se añaden principios duplicados."""
-        # Intentar añadir un principio que ya existe desde el setUp
-        self.kb.add_principle("Doc1", "Cat1", "Proteger siempre al usuario.")
-        all_principles = self.kb.get_all_principles()
-        self.assertEqual(len(all_principles), 3) # Debería seguir siendo 3
+    def test_add_fact_and_graph_creation(self):
+        """Prueba que un hecho añade nodos y relaciones al grafo."""
+        fact = "MEA-Core usa Python"
+        self.km.add_fact(fact)
+        
+        self.assertTrue(self.km.graph.has_node("MEA-Core"))
+        self.assertTrue(self.km.graph.has_node("Python"))
+        self.assertTrue(self.km.graph.has_edge("MEA-Core", "Python"))
+        edge_data = self.km.graph.get_edge_data("MEA-Core", "Python")
+        self.assertEqual(edge_data['label'], 'usa')
 
-    def test_get_by_category_like(self):
-        """Prueba la búsqueda de categorías con LIKE."""
-        ethical_principles = self.kb.get_principles_by_category("Ética")
-        self.assertEqual(len(ethical_principles), 2)
+    def test_add_relation(self):
+        """Prueba que se puede añadir una relación explícita."""
+        self.km.add_relation("Gemini", "Google", "es de")
+        self.assertTrue(self.km.graph.has_edge("Gemini", "Google"))
+        self.assertEqual(self.km.graph.get_edge_data("Gemini", "Google")['label'], "es de")
 
-        arch_principles = self.kb.get_principles_by_category("Arquitectura")
-        self.assertEqual(len(arch_principles), 1)
+    def test_query(self):
+        """Prueba que una consulta devuelve tanto hechos como relaciones."""
+        self.km.add_fact("La IA necesita ética")
+        self.km.add_fact("La ética guía a la IA")
 
-    def test_search_with_bm25(self):
-        """Prueba la nueva funcionalidad de búsqueda con BM25."""
-        # 1. Búsqueda relevante
-        query = "¿Cuál es la directriz sobre el daño?"
-        results = self.kb.search(query, top_n=1)
-        self.assertEqual(len(results), 1)
-        # El resultado más relevante debería ser sobre "no causar daño"
-        self.assertIn("daño", results[0][2])
+        results = self.km.query("La ética")
+        
+        # La búsqueda LIKE '%La ética%' solo debe encontrar el hecho que lo contiene literalmente
+        self.assertEqual(len(results['direct_facts']), 1)
+        self.assertIn("La ética guía a la IA", results['direct_facts'])
+        self.assertNotIn("La IA necesita ética", results['direct_facts'])
+        
+        # La búsqueda de relaciones debe ser exacta con el nodo
+        self.assertEqual(len(results['relations']), 1)
+        self.assertIn("La ética -> guía -> a la IA", results['relations'])
 
-        # 2. Búsqueda sobre arquitectura
-        query_arch = "¿Cómo debe ser la arquitectura del sistema?"
-        results_arch = self.kb.search(query_arch, top_n=1)
-        self.assertEqual(len(results_arch), 1)
-        self.assertIn("modular y escalable", results_arch[0][2])
+    def test_save_and_load_graph(self):
+        """Prueba que el grafo se guarda y se carga correctamente."""
+        self.km.add_fact("El sol es una estrella")
+        self.km.save()
 
-        # 3. Búsqueda no relevante
-        query_irrelevant = "¿De qué color es el cielo?"
-        results_irrelevant = self.kb.search(query_irrelevant)
-        self.assertEqual(len(results_irrelevant), 0)
+        # Crear una nueva instancia para forzar la carga desde el archivo
+        new_km = KnowledgeManager(db_path=self.db_path, graph_path=self.graph_path)
+        self.assertTrue(new_km.graph.has_node("El sol"))
+        self.assertTrue(new_km.graph.has_edge("El sol", "una estrella"))
+        new_km.close()
+
+    def test_duplicate_fact(self):
+        """Prueba que añadir un hecho duplicado no causa errores ni duplicados."""
+        fact = "El cielo es azul"
+        self.km.add_fact(fact)
+        self.km.add_fact(fact) # Añadir por segunda vez
+
+        cursor = self.km.conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM facts WHERE content=?", (fact,))
+        count = cursor.fetchone()[0]
+        self.assertEqual(count, 1)
+        self.assertEqual(len(self.km.graph.nodes()), 2)
 
 if __name__ == "__main__":
     unittest.main()

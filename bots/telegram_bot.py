@@ -1,85 +1,61 @@
+"""Bot de Telegram para interactuar con MEA-Core."""
+
 import os
 import sys
-from typing import List
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Añadir el directorio raíz al path para poder importar los módulos del core
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.settings_manager import SettingsManager
-from core.memory import MemoryStore
-from core.ethics import EthicsCore
-from core.brain import Brain
-from core.remote_logger import RemoteLogger
-from core.swarm import SwarmController
+from bots.base_bot import BaseBot
 
-class MeaTelegramBot:
+class MeaTelegramBot(BaseBot):
+    """Implementación del bot para Telegram."""
+
     def __init__(self):
-        # Inicializar todos los componentes del core
-        self.settings_manager = SettingsManager()
-        self.responses = self.settings_manager.get_responses()
-        self.mem: MemoryStore = MemoryStore()
-        self.ethics: EthicsCore = EthicsCore()
-        self.brain: Brain = Brain(self.settings_manager.settings, self.responses)
-        self.remote_logger: RemoteLogger = RemoteLogger(self.settings_manager.settings)
-        self.swarm_controller: SwarmController = SwarmController(self.settings_manager.settings, self.mem)
-        self.context: List[str] = []
-        instance_id = self.mem.get_instance_id()
+        """Inicializa el bot y los componentes del núcleo de MEA."""
+        super().__init__(node_id="telegram")
+        instance_id = self.memory.get_instance_id()
         print(f'--- MEA-Core (Telegram Bot) Iniciado (ID: {instance_id[:8]}) ---')
 
+    async def send_message(self, message: str, **kwargs):
+        """Envía un mensaje al chat de Telegram."""
+        update = kwargs.get('update')
+        if update:
+            await update.message.reply_text(message, parse_mode='MarkdownV2')
+
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Maneja el comando /start y envía un saludo."""
         greeting = self.brain.get_greeting()
         await update.message.reply_text(f'¡Hola! Soy MEA-Core IA. {greeting}')
 
     async def set_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Maneja el comando /set para guardar un par clave-valor en la memoria."""
         try:
             key = context.args[0]
             value = " ".join(context.args[1:])
-            self.mem.set(key, value)
-            await update.message.reply_text(f'[Memoria] `{key}` = `{value}`', parse_mode='MarkdownV2')
+            await self.handle_command(f"!set {key} {value}", update=update)
         except (IndexError, ValueError):
             await update.message.reply_text("Uso: `/set <clave> <valor>`")
 
     async def get_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Maneja el comando /get para recuperar un valor de la memoria."""
         try:
             key = context.args[0]
-            value = self.mem.get(key)
-            await update.message.reply_text(f'[Memoria] `{key}` -> `{value or "No encontrado"}`', parse_mode='MarkdownV2')
+            await self.handle_command(f"!get {key}", update=update)
         except IndexError:
             await update.message.reply_text("Uso: `/get <clave>`")
 
     async def dump_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        dump = self.mem.dump_all()
-        dump_str = str(dump)
-        # Telegram tiene un límite de 4096 caracteres
-        if len(dump_str) > 4000:
-            await update.message.reply_text(f'[Memoria] Dump completo (parcial):\n```\n{dump_str[:4000]}...\n```', parse_mode='MarkdownV2')
-        else:
-            await update.message.reply_text(f'[Memoria] Dump completo:\n```\n{dump_str}\n```', parse_mode='MarkdownV2')
+        """Maneja el comando /dump para mostrar todo el contenido de la memoria kv."""
+        await self.handle_command("!dump", update=update)
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        q = update.message.text
-
-        # 1. Comprobación ética
-        if not self.ethics.check_action(q):
-            explanation = self.ethics.explain_decision(q)
-            await update.message.reply_text(f"[Ética] {explanation}")
-            return
-
-        # 2. Obtener respuesta del cerebro
-        respuestas = self.brain.get_response(q)
-
-        # 3. Enviar respuestas
-        for respuesta in respuestas:
-            await update.message.reply_text(respuesta)
-
-        # 4. Registrar en la memoria y logs remotos
-        self.mem.log_conversation(user_input=q, bot_output=respuestas)
-        self.remote_logger.log(user_input=q, bot_output=respuestas)
-        self.context.append(q)
+        """Maneja los mensajes de texto que no son comandos."""
+        await self.process_message(update.message.text, update=update)
 
     def run(self):
+        """Configura y ejecuta el bot de Telegram."""
         TOKEN = os.environ.get("TELEGRAM_TOKEN")
         if not TOKEN:
             print("[ERROR] El token de Telegram no está configurado.")
@@ -95,4 +71,8 @@ class MeaTelegramBot:
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
 
         print("Iniciando bot de Telegram...")
-        # Iniciar ciclo de enjambre en segundo plano (de forma síncrona en un hilo)
+        application.run_polling()
+
+if __name__ == '__main__':
+    bot = MeaTelegramBot()
+    bot.run()

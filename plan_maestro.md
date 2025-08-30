@@ -246,7 +246,7 @@ Permitir que la IA analice, evalúe y modifique su propio código, algoritmos y 
 17. Análisis y Comprensión del Propio Código
     17.1. Desarrollar un modelo de la propia arquitectura y código base.
         17.1.1. Crear un grafo de dependencias del código.
-        17.1.2. Generar representaciones semánticas del código.
+        1.1.2. Generar representaciones semánticas del código.
     17.2. Implementar herramientas de análisis estático y dinámico del código.
         17.2.1. Desarrollar analizadores de código para identificar patrones y estructuras.
         17.2.2. Implementar herramientas para monitorear la ejecución del código en tiempo real.
@@ -463,4 +463,39 @@ Escalar la arquitectura a un sistema distribuido de agentes colaborativos y opti
     36.1. Desarrollar protocolos de comunicación eficientes y seguros.
         36.1.1. Definir el formato de los mensajes entre agentes.
         36.1.2. Implementar cifrado y autenticación para la comunicación.
-    36.2. Implementar mecanismos
+    36.2. Implementar mecanismos de coordinación.
+        36.2.1. Desarrollar algoritmos de consenso para la toma de decisiones distribuidas.
+        36.2.2. Implementar estrategias de asignación de tareas y balanceo de carga.
+        36.2.3. Desarrollar mecanismos para la resolución de conflictos entre agentes.
+
+37. Conocimiento y Memoria Compartida
+    37.1. Diseñar una arquitectura para una base de conocimiento distribuida.
+        37.1.1. Investigar soluciones de bases de datos distribuidas o sistemas de archivos.
+        37.1.2. Definir cómo se sincroniza y se comparte el conocimiento entre agentes.
+    37.2. Implementar mecanismos de acceso y actualización concurrente.
+        37.2.1. Asegurar la consistencia de los datos en el swarm.
+        37.2.2. Implementar bloqueos o transacciones distribuidas si es necesario.
+    37.3. Desarrollar la capacidad de aprendizaje colaborativo.
+        37.3.1. Permitir que los agentes aprendan de las experiencias de otros.
+        37.3.2. Consolidar el conocimiento adquirido por agentes individuales en la memoria compartida.
+
+38. Optimización y Resiliencia del Swarm
+    38.1. Desarrollar métricas para evaluar el rendimiento del swarm.
+        38.1.1. Medir la latencia de comunicación, el rendimiento de las tareas, etc.
+    38.2. Implementar algoritmos de optimización del swarm.
+        38.2.1. Ajustar dinámicamente el número de agentes.
+        38.2.2. Optimizar la topología de la red de comunicación.
+    38.3. Diseñar para la resiliencia y la tolerancia a fallos.
+        38.3.1. Implementar mecanismos de detección de fallos en los agentes.
+        38.3.2. Desarrollar estrategias de recuperación y reasignación de tareas.
+
+39. Ética y Seguridad en el Swarm
+    39.1. Extender el motor ético a un entorno distribuido.
+        39.1.1. Desarrollar mecanismos de toma de decisiones éticas colaborativas.
+        39.1.2. Asegurar que el comportamiento colectivo del swarm sea ético.
+    39.2. Asegurar la comunicación y los datos del swarm.
+        39.2.1. Implementar políticas de seguridad para el acceso a la memoria compartida.
+        39.2.2. Proteger el swarm contra ataques coordinados o la infiltración de agentes maliciosos.
+    39.3. Desarrollar mecanismos de auditoría y rendición de cuentas para el swarm.
+        39.3.1. Registrar las decisiones y acciones importantes del swarm.
+        39.3.2. Permitir la investigación de comportamientos no deseados a nivel de sistema.

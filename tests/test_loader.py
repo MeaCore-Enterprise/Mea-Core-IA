@@ -6,7 +6,7 @@ import time
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.loader import CoreLoader
+from core.cargador import CoreLoader
 
 # Crear un plugin de prueba
 PLUGIN_DIR = os.path.join(os.path.dirname(__file__), '..', 'plugins')
@@ -55,6 +55,7 @@ class TestCoreLoader(unittest.TestCase):
         self.assertTrue(self.loader.start('test_plugin'))
         handle = self.loader.plugins.get('test_plugin')
         self.assertIsNotNone(handle.thread)
+        time.sleep(0.1) # Dar tiempo al hilo para que inicie
         self.assertTrue(handle.thread.is_alive())
         # Darle tiempo al hilo para que corra
         time.sleep(0.1)

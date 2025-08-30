@@ -1,0 +1,12 @@
+La Inteligencia Artificial (IA) es un término amplio que abarca diversas estrategias y técnicas utilizadas para que las máquinas imiten la inteligencia humana
+. Su propósito fundamental es que un sistema informático realice tareas humanas complejas de manera eficiente, lo que incluye el aprendizaje, la resolución de problemas y el reconocimiento de patrones. En esencia, la IA busca que los programas y las máquinas adquieran un nivel de razonamiento comparable al humano, lo que implica aprender conceptos abstractos, adaptar estrategias a nuevas situaciones y comprender el marco general de las acciones que realiza
+.
+Dentro del ámbito de la IA, el Machine Learning (ML) es una rama específica
+. Se define como la ciencia y el arte de programar computadoras para que aprendan a partir de datos, sin ser programadas explícitamente. El objetivo principal del machine learning es que una máquina analice grandes volúmenes de datos y, utilizando modelos estadísticos, identifique patrones para producir un resultado con una probabilidad de corrección o un grado de confianza asociado. El ML permite adaptar programas al cambio y es especialmente útil para problemas que son demasiado complejos para ser resueltos algorítmicamente, problemas que están en constante evolución o para la minería de datos, es decir, obtener conocimiento a partir de grandes cantidades de información
+.
+La relación entre IA y ML es intrínseca: todas las soluciones de machine learning son soluciones de IA, pero no todas las actividades de IA se consideran machine learning
+. Ambos campos se dedican a crear software capaz de analizar, interpretar y comprender datos de formas complejas, con el objetivo de que este software realice tareas con la misma rapidez o incluso más que un humano
+.
+El aprendizaje en ML se fundamenta en los datos
+. Los datos se definen como características o información, generalmente numéricas, que se recopilan mediante la observación, o como un conjunto de valores de variables cualitativas o cuantitativas sobre personas u objetos. Aunque existen muchos tipos de datos complejos, como secuencias de ADN, texto, imágenes, video o audio, en cursos introductorios de ML el enfoque suele estar en los datos tabulares. Un dataset tabular es una colección de objetos con sus atributos, que pueden ser numéricos (como temperatura o altura) o discretos/categóricos (como sexo o estado civil)
+.

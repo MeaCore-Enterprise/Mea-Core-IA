@@ -1,0 +1,80 @@
+Los sesgos en la IA, también conocidos como sesgos de machine learning o sesgos algorítmicos, son predisposiciones sistemáticas en los sistemas de IA que producen resultados distorsionados, reflejando y perpetuando prejuicios humanos y desigualdades sociales históricas y actuales
+. Cuando no se abordan, estos sesgos obstaculizan la participación de las personas en la economía y la sociedad, y reducen el potencial de la IA, generando desconfianza
+.
+• Origen de los Sesgos en la IA:
+    ◦ Datos de Entrenamiento Sesgados: Los sistemas de IA aprenden a tomar decisiones basándose en datos de entrenamiento, por lo que su evaluación es esencial
+.
+        ▪ Muestreo Sesgado: Si los datos de entrenamiento tienen grupos sobrerrepresentados o infrarrepresentados, el algoritmo puede cometer errores. Por ejemplo, los algoritmos de reconocimiento facial entrenados predominantemente con personas de raza blanca pueden tener menor precisión con personas de color
+.
+        ▪ Etiquetado Inconsistente: La forma en que se etiquetan los datos de entrenamiento puede introducir sesgos, como en herramientas de contratación que excluyen a solicitantes cualificados
+.
+        ▪ Desequilibrio de Datos: Si los datos no son representativos, pueden discriminar a minorías
+.
+    ◦ Sesgo Algorítmico: Puede surgir de errores de programación o cuando un desarrollador pondera injustamente factores en la toma de decisiones del algoritmo, basándose en sus propios sesgos conscientes o inconscientes
+. Los datos de entrenamiento defectuosos también pueden dar lugar a algoritmos que amplifican el sesgo inherente
+.
+    ◦ Sesgo Cognitivo Humano: Las experiencias y preferencias de las personas influyen en cómo procesan información y emiten juicios, lo que puede llevar a incorporar estos sesgos en los sistemas de IA a través de la selección o ponderación de datos. Un ejemplo es favorecer datasets recopilados de una población específica en lugar de una serie de poblaciones globales
+.
+    ◦ Otras Fuentes: Incluyen la adquisición de datos con un sesgo inherente, la definición o etiquetado de datos por error humano o criterios subjetivos, y el uso de menos variables de las necesarias, lo que puede inferir relaciones erróneas entre los datos
+.
+• Tipos Comunes de Sesgos en la IA:
+    ◦ Sesgo de Selección: Ocurre cuando los datos de entrenamiento no representan adecuadamente a toda la población. Un algoritmo de diagnóstico médico entrenado solo con datos de una población específica puede no funcionar correctamente para otras
+.
+    ◦ Sesgo Implícito o de Confirmación: Se produce cuando los desarrolladores introducen involuntariamente sus propios prejuicios en los algoritmos, seleccionando variables que confirman expectativas previas o ignorando datos que las contradicen
+. Un ejemplo notable es la preferencia por candidatos masculinos en algoritmos de selección de personal debido a la prevalencia histórica de hombres en ciertos roles
+.
+    ◦ Sesgo de Exclusión: Se refiere a la omisión de variables importantes que podrían influir en el resultado del modelo, llevando a decisiones injustas
+.
+    ◦ Sesgo de Agrupación: Ocurre cuando los algoritmos agrupan datos de manera que refuerzan estereotipos o simplifican en exceso las características de ciertos grupos, lo cual es problemático en aplicaciones de reconocimiento facial
+.
+    ◦ Sesgo Racial y Étnico: Algoritmos que muestran preferencias hacia ciertos grupos raciales o étnicos debido a la representación desigual en los datos de entrenamiento
+.
+    ◦ Sesgo de Edad: Discriminación hacia individuos de ciertas edades, ignorando sus necesidades y preferencias
+.
+    ◦ Sesgo de Clase Social y Económica: Decisiones automatizadas que favorecen a individuos de ciertos estratos socioeconómicos, perpetuando la exclusión financiera
+.
+    ◦ Sesgo Lingüístico y Cultural: Algoritmos que no reconocen o valoran adecuadamente la diversidad lingüística y cultural, generando respuestas inadecuadas
+.
+    ◦ Sesgo Geográfico: La IA podría mostrar preferencias por usuarios de ciertas ubicaciones geográficas debido a la prevalencia de datos de esos lugares en el conjunto de entrenamiento
+.
+• Consecuencias del Sesgo Algorítmico:
+    ◦ Discriminación y Perpetuación de Desigualdades: Los sesgos pueden llevar a decisiones injustas que afectan desproporcionadamente a ciertos grupos raciales o étnicos
+. Por ejemplo, sistemas de diagnóstico asistido por ordenador han mostrado menor precisión para pacientes negros
+.
+    ◦ Resultados Erróneos o Poco Fiables: Modelos ineficaces que comprometen la fiabilidad de los análisis predictivos
+.
+    ◦ Vulneración de Derechos Fundamentales: La utilización de biometría, por ejemplo, ha suscitado controversias por su potencial vulneración de derechos
+.
+    ◦ Impactos en Empleos: Sistemas de seguimiento de candidatos o de selección de personal pueden favorecer a un género sobre otro
+.
+    ◦ Manipulación y Aislamiento Social: En el caso de la IA empática, puede generar dependencia, aislamiento social e incluso incitar a conductas negativas
+.
+    ◦ Pérdida de Privacidad: La recopilación masiva de datos íntimos por la IA empática (tono de voz, expresiones faciales, conversaciones personales) plantea riesgos de filtraciones, hackeos o uso indebido, comprometiendo la "privacidad emocional"
+.
+• Estrategias para Mitigar y Reducir el Sesgo:
+    ◦ Diversificación y Calidad de Datos de Entrenamiento: Es fundamental asegurarse de que los datos sean diversos, representativos y de alta calidad para evitar la exclusión de grupos específicos
+.
+    ◦ Auditorías Algorítmicas Regulares: Realizar auditorías periódicas de los algoritmos, tanto internas como por entidades independientes, para detectar y corregir sesgos en algoritmos, datos, procesos y resultados
+. Esto incluye pruebas de rendimiento en diferentes subgrupos demográficos
+.
+    ◦ Transparencia y Explicabilidad: Promover la transparencia en el desarrollo y uso de algoritmos, explicando cómo funcionan y cómo se toman las decisiones
+. Los sistemas de IA generativa pueden ofrecer feedback sobre cómo se llegó a un resultado
+.
+    ◦ Gobernanza de la IA: Establecer políticas, prácticas y marcos para guiar el desarrollo y uso responsable de la IA
+. Esto incluye la conformidad con regulaciones, el fomento de la confianza y la transparencia, la imparcialidad y un "toque humano" (ej. sistema human-in-the-loop)
+.
+    ◦ Educación y Capacitación en Ética de IA: Fomentar la formación continua en ética, sesgos, privacidad y derechos humanos para desarrolladores y usuarios
+.
+    ◦ Enfoques Interdisciplinarios y Equipos Diversos: Colaborar con expertos de diversas disciplinas (sociología, psicología, derecho) e integrar la diversidad en los equipos de desarrollo para identificar y abordar problemas desde múltiples perspectivas
+.
+    ◦ Participación Comunitaria: Involucrar a las comunidades afectadas en el proceso de desarrollo de IA para asegurar que los sistemas sean inclusivos y representativos de sus necesidades y valores
+.
+    ◦ Certificaciones y Estándares para la IA Ética: Desarrollar estándares y certificaciones para demostrar el cumplimiento de normas éticas en productos y servicios de IA
+.
+    ◦ Monitoreo Continuo: Medir frecuentemente las soluciones de IA y establecer equipos humanos dedicados a su monitoreo para detectar y corregir sesgos a medida que evolucionan los datos y las necesidades
+.
+    ◦ Legislación y Regulación: Establecer límites claros y ejecutables sobre el desarrollo y uso de la IA, incluyendo la privacidad de datos, el uso de tecnologías de reconocimiento facial y limitaciones en la automatización en sectores críticos
+. Por ejemplo, la Ley de IA de la UE prohíbe el reconocimiento de emociones en entornos laborales y educativos
+.
+    ◦ Neuroderechos: Considerar la inclusión de "neuroderechos" en las legislaciones para proteger la actividad mental y emocional de la persona frente a tecnologías invasivas
+.

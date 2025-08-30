@@ -1,0 +1,31 @@
+La inteligencia artificial "percibe" el mundo de manera análoga a cómo lo hace el cerebro humano, basándose en la asimilación y clasificación de patrones de datos para extraer conclusiones
+.
+• Redes Neuronales Artificiales Profundas (Deep Neural Networks):
+    ◦ Concepto y Funcionamiento: Son uno de los métodos más empleados para desarrollar IA, permitiendo a las máquinas reconocer diferentes niveles de abstracción
+. El Deep Learning representa un tipo más sofisticado de integración de datos en comparación con el Machine Learning genérico. Estas redes imitan el funcionamiento de las redes neuronales humanas mediante principios matemáticos, componiéndose de "neuronas" (unidades básicas de computación) agrupadas en capas. Cada capa procesa la información con un nivel de abstracción cada vez más elevado
+.
+    ◦ Proceso: La capa inicial recibe el contenido explícito de los datos (por ejemplo, los píxeles de una imagen). Las capas intermedias son responsables de producir combinaciones aritméticas, y la última capa emite la información semántica, expresando el concepto básico que permite interpretar datos similares en el futuro
+.
+    ◦ Aprendizaje por Ensayo y Error: Las conexiones de la red se fundamentan en un proceso de ensayo-error. La red otorga etiquetas a la información y, en caso de error, la devuelve a las capas anteriores para corregirla y evitar su propagación
+.
+    ◦ Capacidad de Abstracción: Este sistema permite a la IA clasificar un mismo concepto independientemente de las diferencias irrelevantes que pueda tener cada representación del concepto en cuestión
+.
+    ◦ Limitaciones: La gran multiplicidad de conexiones en las capas intermedias hace imposible para sus creadores diferenciar y documentar el circuito exacto que recorren los datos. Además, el proceso de abstracción por parte de la máquina requiere una gran cantidad de datos, lo que implica una considerable capacidad de almacenamiento y un tiempo determinado para procesarlos
+.
+• Perceptrones:
+    ◦ Origen: El término "perceptrón" fue acuñado en 1957 por Frank Rosenblatt, inspirándose en las redes neuronales humanas y su funcionamiento
+.
+    ◦ Estructura: Una red neuronal artificial, al igual que nuestra red neuronal visual, se compone de tres capas: entrada, oculta y salida. Las entradas reciben un valor que pasa a la capa oculta, y de allí a la salida
+.
+    ◦ Algoritmo de Aprendizaje: Se utiliza un algoritmo para determinar el comportamiento deseado, por ejemplo, si los datos de entrada de un número escrito a mano cumplen con las especificaciones conocidas de ese número
+.
+    ◦ Clasificación Binaria: El algoritmo perceptrón utiliza un sistema de clasificación binaria de los datos
+. Para resolver las limitaciones de los perceptrones simples, se han desarrollado las redes perceptrón multicapa, convirtiéndose en uno de los algoritmos de aprendizaje más importantes
+.
+• Percepción Artificial y Similitudes con el Cerebro Humano:
+    ◦ Extracción de Conclusiones: La inteligencia en los seres humanos surge de la capacidad de extraer conclusiones a partir de patrones de "datos" que llegan a través de los sentidos
+. La IA funciona de manera muy similar, justificando los datos con patrones preexistentes para llegar a una conclusión que "percibe" como la correcta
+.
+    ◦ Aprendizaje por Experiencia: Las máquinas se programan con vías neuronales artificiales para tomar decisiones, imitando el cerebro humano. Al igual que los humanos, la IA necesita aprender de la experiencia, el ensayo y error, e incluso adquirir nuevas habilidades sin interacción humana
+.
+    ◦ Necesidad de "Sueño": Investigadores han descubierto que, al igual que el cerebro humano, los sistemas de IA también necesitan periodos de "sueño" o descanso después de largos períodos de aprendizaje no supervisado. Esto es crucial para mantener su máxima funcionalidad y corregir el mal funcionamiento. La exposición de las redes neuronales artificiales a un "tiempo de sueño analógico" resultó ser un método eficaz para que se reinicien y recarguen, alcanzando un nuevo nivel de percepción del mundo

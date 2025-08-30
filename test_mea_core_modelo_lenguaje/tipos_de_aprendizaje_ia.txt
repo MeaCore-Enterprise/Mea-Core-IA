@@ -1,0 +1,43 @@
+Los modelos de inteligencia artificial se basan principalmente en tres enfoques de entrenamiento: el aprendizaje supervisado, el aprendizaje no supervisado y el aprendizaje por refuerzo
+.
+• 1. Aprendizaje Supervisado:
+    ◦ Concepto y Características: Este enfoque utiliza datos de entrenamiento que ya incluyen las salidas esperadas, conocidas como etiquetas
+. Los algoritmos aprenden a resolver problemas estableciendo una relación entre los valores de entrada y los de salida etiquetados. Una limitación importante es que requiere un dataset de entrenamiento donde cada ejemplo tenga su etiqueta correspondiente, lo que a menudo implica construir o anotar estos datasets
+.
+    ◦ Tareas Principales: Las dos tareas principales son la clasificación, que consiste en asignar los atributos de un objeto a una categoría (clase), y la regresión, que predice una variable objetivo numérica a partir de los atributos de un ejemplo
+.
+    ◦ Aplicaciones Comunes: Incluyen la detección de spam en correos electrónicos
+, el análisis de sentimientos para clasificar tuits en positivo, neutral o negativo, la detección de fraude en transacciones bancarias, el diagnóstico médico (como la detección de cáncer de mama), la predicción de precios de propiedades y la predicción de índices de felicidad basada en indicadores económicos como el PIB. Un ejemplo práctico es el entrenamiento de un modelo Random Forest para identificar transacciones fraudulentas a partir de datos etiquetados
+.
+• 2. Aprendizaje No Supervisado:
+    ◦ Concepto y Características: A diferencia del aprendizaje supervisado, este enfoque funciona sin datos etiquetados
+. El sistema explora libremente la información para descubrir patrones ocultos o estructuras internas en los datos no etiquetados. Es más exploratorio, y su principal limitación es la dificultad para evaluar los resultados, ya que no existe una "respuesta correcta" predefinida
+.
+    ◦ Técnicas Principales: Se utilizan técnicas como el clustering (agrupamiento), que identifica grupos de objetos (clusters) con características similares entre sí y distintas de otros grupos
+, y la reducción de dimensionalidad, que simplifica la representación de los datos al reducir la cantidad de atributos, combinando aquellos que son redundantes o altamente correlacionados. Esta última técnica puede mejorar la eficiencia de los algoritmos de ML si se aplica antes del entrenamiento
+.
+    ◦ Aplicaciones Comunes: Resulta particularmente útil en la exploración de bases de datos masivas y la detección de fraudes
+. También se aplica en la segmentación de mercado para identificar grupos de clientes con comportamientos de consumo similares, lo que ayuda a dirigir la publicidad y las recomendaciones, y en el clustering de documentos para agrupar textos con temáticas similares
+.
+• 3. Aprendizaje por Refuerzo (RL - Reinforcement Learning):
+    ◦ Concepto y Características: Este enfoque se basa en un sistema de recompensas y penalizaciones
+. Un agente interactúa con un entorno, toma una acción y recibe una recompensa o penalización, aprendiendo por ensayo y error a ajustar sus decisiones para maximizar una noción de "recompensa" o premio acumulado a lo largo del tiempo. El agente debe considerar las consecuencias a largo plazo de sus acciones, lo que lo hace adecuado para problemas que requieren razonamiento a largo plazo. A diferencia de las técnicas clásicas, los algoritmos de RL no requieren conocimiento explícito de los Procesos de Decisión de Markov (MDP) y son eficientes para grandes MDP donde los métodos exactos no son viables
+.
+    ◦ Mecanismos de Exploración: El RL requiere mecanismos de exploración inteligente. Un método común es ε-greedy, donde el agente elige la acción con el mejor efecto a largo plazo con una probabilidad de 1-ε y, en caso contrario, elige una acción aleatoriamente
+.
+    ◦ Criterios de Optimalidad: Para problemas episódicos (que terminan al alcanzar un "estado terminal"), el objetivo es maximizar la recompensa total esperada. En problemas no episódicos, el retorno se "descuenta" utilizando un factor de descuento γ
+. La búsqueda de una política óptima puede restringirse a políticas estacionarias deterministas, que seleccionan acciones basándose únicamente en el estado actual
+.
+    ◦ Algoritmos:
+        ▪ Fuerza Bruta: Implica muestrear resultados para cada política posible y elegir la de mayor retorno esperado, pero puede ser ineficiente por el gran número de políticas
+.
+        ▪ Acercamiento al Valor de la Función: Busca una política que maximice el retorno mediante la estimación de valores esperados para ciertas políticas, basándose en la teoría de MDPs
+. Incluye el Método de Montecarlo, que promedia retornos para estimar el valor de un par estado-acción, y los Métodos de Diferencias Temporales (TD), que corrigen ineficiencias de Montecarlo y utilizan ecuaciones recursivas de Bellman. Para entornos grandes, se usan aproximaciones de funciones, como la lineal
+.
+        ▪ Búsqueda Política Directa: Implica buscar directamente en el espacio de la política, utilizando métodos basados en gradiente (policy gradient methods) o métodos libres de gradiente (como recocido simulado)
+.
+    ◦ Aplicaciones Comunes: Se ha aplicado con éxito en el control de robots, telecomunicaciones, juegos como backgammon y damas
+. También es fundamental en el desarrollo de sistemas autónomos en robótica y videojuegos (mediante Deep Q-Networks), y en la creación de entornos dinámicos. Ejemplos notables incluyen robots que aprenden a caminar y sistemas de recomendación como los de Netflix. Un logro significativo fue AlphaGo de DeepMind, que venció a un campeón mundial de Go
+.
+    ◦ Teoría: La teoría del RL para MDPs pequeños y finitos es madura, pero para MDPs grandes aún se requiere más investigación, especialmente en exploración eficiente y límites de rendimiento en tiempo finito
+.

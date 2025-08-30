@@ -7,7 +7,7 @@ import json
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.personality import load_personality, save_personality, DEFAULT
+from core.personalidad import load_personality, save_personality, DEFAULT
 
 class TestPersonality(unittest.TestCase):
 

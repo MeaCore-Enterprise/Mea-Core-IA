@@ -69,7 +69,7 @@ def main():
     initialize_knowledge_base()
 
     # Cargar settings para decidir si iniciar el servidor
-    from core.settings_manager import SettingsManager
+    from core.gestor_configuracion import SettingsManager
     settings_manager = SettingsManager()
     settings = settings_manager.settings
     if settings:

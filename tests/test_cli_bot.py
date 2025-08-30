@@ -30,7 +30,7 @@ class TestCliBot(unittest.TestCase):
         """Prueba una interacción simple seguida de una salida."""
         bot = CliBot()
         bot.brain.get_farewell = lambda: "Adiós."
-        bot.process_input = unittest.mock.MagicMock()
+        bot.process_input = unittest.mock.AsyncMock()
 
         bot.run()
 
@@ -43,7 +43,7 @@ class TestCliBot(unittest.TestCase):
         """Prueba que el comando !set es manejado correctamente."""
         bot = CliBot()
         bot.handle_command = unittest.mock.MagicMock(return_value=True)
-        bot.process_input = unittest.mock.MagicMock()
+        bot.process_input = unittest.mock.AsyncMock()
 
         bot.run()
         

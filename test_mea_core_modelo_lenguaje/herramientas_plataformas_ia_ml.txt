@@ -1,0 +1,59 @@
+Para el desarrollo y entrenamiento de modelos de IA y Machine Learning, se utiliza una amplia gama de herramientas y tecnologías, incluyendo frameworks, recursos de cálculo y bases de datos
+.
+• 1. Frameworks Populares:
+    ◦ TensorFlow: Una plataforma integral para IA y Deep Learning. Permite crear modelos de aprendizaje a gran escala, siendo muy útil para la clasificación de números, el reconocimiento de imágenes y el análisis de textos
+. Facilita la creación de aplicaciones con Python y acelera la generación de gráficos de datos (Dataflow). Se usa para construir sistemas de recomendación mediante aprendizaje por refuerzo. Permite construir y entrenar redes neuronales complejas con su API de alto nivel Keras y monitorear el proceso con TensorBoard. Requiere GPUs o TPUs potentes debido a su consumo de recursos
+.
+    ◦ PyTorch: Un framework de código abierto que ofrece un enfoque dinámico y flexible para el entrenamiento de IA. Es muy utilizado en ciencia de datos y Deep Learning, facilitando la creación de modelos complejos y soportando una multitud de parámetros
+. Es eficiente para el Procesamiento del Lenguaje Natural (PLN) y la visión por computadora, permitiendo cambios en la estructura de la red sobre la marcha mediante su Dynamic Computational Graph
+.
+    ◦ Scikit-learn: Una biblioteca de Python diseñada para simplificar el desarrollo de modelos de machine learning. Su interfaz intuitiva proporciona acceso fácil a una amplia gama de algoritmos, incluyendo tareas de regresión, clustering y reducción de dimensionalidad
+. Booking.com, por ejemplo, lo utiliza para crear IA generativa y recomendar destinos
+.
+    ◦ Keras: Una API de alto nivel utilizada para desarrollar aplicaciones basadas en PLN y modelos generativos. Su interfaz sencilla facilita la creación rápida de prototipos
+. Se enfoca en la velocidad de depuración, el mantenimiento, la capacidad de despliegue y la elegancia del código, lo que resulta en un código base comparativamente más pequeño
+.
+    ◦ AutoML (Automated Machine Learning): Permite programar gran parte del proceso de entrenamiento, ajustando parámetros de los modelos de IA sin intervención humana
+. Las IA de autoaprendizaje se adaptan continuamente a nuevos datos, mejorando su rendimiento
+.
+• 2. Recursos de Cálculo: La potencia de estos recursos es fundamental para procesar operaciones complejas y mejorar la velocidad de respuesta de los modelos de IA
+.
+    ◦ CPU (Central Processing Unit): Son procesadores de propósito general que realizan tareas secuenciales y aceleran el preprocesamiento de datos. Sin embargo, su potencia es limitada para el entrenamiento de modelos de Deep Learning
+.
+    ◦ GPU (Graphics Processing Unit): Unidades de procesamiento gráfico que destacan en el procesamiento simultáneo de grandes conjuntos de datos. Aceleran el entrenamiento de modelos, especialmente en operaciones de visión por computador y procesamiento del lenguaje natural
+.
+    ◦ TPU (Tensor Processing Unit): Procesadores especializados en la optimización de cálculos matriciales, indispensables en Machine Learning. Ofrecen un alto rendimiento y un bajo consumo energético, haciéndolos ideales para el entrenamiento de IA a gran escala
+.
+• 3. Bases de Datos y Almacenamiento de Datos: Son cruciales para mejorar la velocidad de procesamiento de datos y garantizar una gestión eficiente de la información
+.
+    ◦ Opciones Disponibles: Incluyen soluciones en la nube (que ofrecen flexibilidad y escalabilidad), sistemas de almacenamiento especializados como discos duros HDD y SSD, y para volúmenes masivos de datos, infraestructuras SAN (Storage Area Network) y NAS (Network Attached Storage)
+.
+    ◦ Alternativas Avanzadas: Como discos SSD NVMe, memoria persistente o memoria SCM. La computación Edge descentralizada puede evitar latencias y satisfacer las necesidades de ancho de banda de la empresa
+.
+• 4. Plataformas Integradas y Otros Servicios:
+    ◦ Google Colab: Un entorno gratuito basado en la nube que permite ejecutar código Python, especialmente útil para ML con datasets. Proporciona acceso a recursos computacionales como GPUs y TPUs
+.
+    ◦ DataRobot: Plataforma galardonada para crear y desplegar modelos predictivos, especializada en IA generativa y predictiva para empresas. Ofrece un flujo de trabajo guiado para usuarios sin conocimientos técnicos y permite explorar múltiples algoritmos e hiperparámetros
+.
+    ◦ Microsoft Azure: Plataforma de computación en la nube que integra capacidades de IA. Es escalable y flexible, útil para desarrollar soluciones de negocio (como chatbots y asistentes virtuales)
+. Ofrece servicios como Azure Machine Learning, Azure Cognitive Services y Azure Bot Service
+.
+    ◦ Google Cloud AI: Solución de IA basada en la nube que proporciona modelos de IA preentrenados para tareas como el reconocimiento de imágenes y el PLN. Se integra con Vertex AI para simplificar la configuración técnica
+. Sus funcionalidades incluyen AutoML, Dialogflow y Vision AI
+.
+    ◦ Vertex AI: Una plataforma de machine learning gestionada por Google Cloud para construir, desplegar y escalar modelos de ML. Ofrece integraciones fluidas con otros servicios de Google Cloud y se ha mejorado con los modelos Gemini de Google para tareas generativas
+.
+    ◦ H2O.ai: Plataforma de machine learning distribuida de código abierto, ideal para la gestión de big data. Permite crear aplicaciones como reconocimiento de imágenes y detección de fraudes mediante diversos algoritmos
+.
+    ◦ IBM Watson Assistant: Plataforma de IA conversacional para crear asistentes de IA generativa orientados a la atención al cliente y operaciones internas. Su constructor de conversaciones cuenta con una interfaz de arrastrar y soltar, y permite el entrenamiento personalizado con datos de la empresa
+.
+    ◦ Amazon SageMaker: Plataforma de IA con infraestructura en la nube totalmente administrada, flujos de trabajo y herramientas para crear, entrenar e implementar modelos de ML
+. Ofrece compatibilidad con requisitos de gobernanza y permite la construcción y perfeccionamiento de modelos básicos. AWS también proporciona servicios prediseñados de IA y ML accesibles a través de APIs
+.
+    ◦ SAP Hana Cloud: Un sistema de gestión de bases de datos multimodal utilizado para crear y lanzar aplicaciones de datos a gran escala, realizar análisis de datos en tiempo real, detectar fraudes y llevar a cabo análisis predictivos
+.
+    ◦ Alteryx Intelligence Suite: Una plataforma potente para el análisis de datos que combina capacidades de preparación, combinación y machine learning. Es útil para extraer datos no estructurados de archivos PDF e imágenes sin necesidad de programación
+.
+    ◦ Claude (Anthropic): Un gran modelo de lenguaje (LLM) para el procesamiento del lenguaje natural que genera texto de calidad humana, contenido creativo y traduce texto
+. Ha sido entrenado con "IA Constitucional" para ser más seguro, preciso y fiable. Es capaz de manejar grandes volúmenes de información (más de 100,000 tokens)
+.

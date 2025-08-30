@@ -9,6 +9,7 @@ LOG_PATH = "data/plugin_logger.log"
 _running = True
 
 def run():
+    """Inicia el bucle principal del plugin, registrando las entradas del usuario."""
     global _running
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(f"[START] Logger iniciado a {time.ctime()}\n")
@@ -21,5 +22,6 @@ def run():
         f.write(f"[STOP] Logger detenido a {time.ctime()}\n")
 
 def stop():
+    """Detiene el bucle principal del plugin."""
     global _running
     _running = False

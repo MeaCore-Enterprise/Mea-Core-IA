@@ -1,105 +1,59 @@
-# 🧠 MEA-Core: IA Ligera Local
+# MEA-Core-Enterprise
 
-[![CI/CD Status](https://github.com/MEA-Technology/MEA-Core-IA/actions/workflows/ci.yml/badge.svg)](https://github.com/MEA-Technology/MEA-Core-IA/actions/workflows/ci.yml)
-
-¡Bienvenido a MEA-Core! Este es un proyecto experimental para desarrollar una inteligencia artificial **extremadamente ligera**, que corre localmente en hardware limitado, sin depender de servidores ni nubes.
+**Copyright (c) 2025, Mea-Core-Enterprise. All rights reserved.**
 
 ---
 
-## 🚀 Guía de Inicio Rápido
+## 1. Overview
 
-Sigue estos pasos para poner en marcha el proyecto.
+MEA-Core-Enterprise is a proprietary, high-performance, and modular artificial intelligence platform. It is designed for local execution, ensuring data privacy and operational independence without reliance on cloud servers for its core functions.
 
-### 1. Requisitos Previos
-- Python 3.10 o superior.
-- Git.
+This software is confidential and proprietary. Unauthorized copying, distribution, or use of this software, or any part thereof, is strictly prohibited.
 
-### 2. Instalación
+## 2. Core Features
 
-```bash
-# Clona el repositorio (si aún no lo has hecho)
-git clone <URL_DEL_REPOSITORIO>
-cd MEA-Core-IA
+- **Proprietary AI Engine:** A sophisticated, locally-run language and reasoning engine that provides deep insights from internal knowledge bases.
+- **Modular and Scalable Architecture:** Built with decoupled components for ethics, memory, knowledge, and reasoning, allowing for robust and scalable deployments.
+- **Secure, Local-First Operation:** All core processing and data storage are handled locally, providing maximum security and confidentiality.
+- **Integrated Knowledge Base:** The system leverages a proprietary knowledge base, allowing it to reason and respond based on its own curated information.
+- **Multi-Interface Deployment:** Includes a Command-Line Interface (CLI) for direct interaction and management.
 
-# (Recomendado) Crea y activa un entorno virtual
-python -m venv venv
-# En Windows
-.\venv\Scripts\activate
-# En macOS/Linux
-source venv/bin/activate
+## 3. Getting Started
 
-# Instala las dependencias
-pip install -r requirements.txt
-```
+### Prerequisites
 
-> **Nota:** Algunas funcionalidades avanzadas (como el modo `rule_engine`) requieren librerías adicionales. Si el sistema te lo indica, puedes instalarlas con `pip install experta`.
+- A valid license for MEA-Core-Enterprise.
+- Python 3.10 or higher.
+- Access to the company's internal package repository.
 
-### 3. Poblar la Base de Conocimiento
+### Installation
 
-La IA puede aprender de documentos externos. Ejecuta el siguiente script una vez para poblar la base de conocimiento inicial.
+Installation instructions are provided in the official deployment guide. Please refer to the documentation supplied with your license.
 
 ```bash
-python tools/import_manifestos.py
+# Example installation (requires access to internal repository)
+# Detailed steps are in the official documentation.
+
+# 1. Activate the virtual environment
+source .venv/bin/activate
+
+# 2. Run the main application
+python3 main.py
 ```
 
-### 4. Ejecutar el Bot de Línea de Comandos (CLI)
+## 4. Usage
 
-Este es el método principal para interactuar con la IA.
+The primary interface for interacting with the AI is the Command-Line Interface (CLI).
 
 ```bash
-python main.py
+# Start the CLI
+python3 main.py
 ```
 
-Ahora puedes hacerle preguntas como `¿cuáles son tus principios éticos?`.
+Once started, the system will be ready to receive commands and queries.
 
----
+## 5. Support and Licensing
 
-## ✅ Pruebas e Integración Continua
+For support, licensing inquiries, or to obtain a license, please contact our sales department.
 
-El proyecto utiliza `pytest` para las pruebas unitarias y de integración. Para ejecutar todas las pruebas localmente:
-
-```bash
-pytest
-```
-
-Hemos configurado un pipeline de Integración Continua (CI) con GitHub Actions. Las pruebas se ejecutan automáticamente en cada `push` y `pull request` para asegurar la calidad y estabilidad del código.
-
----
-
-## 🤖 Arquitectura y Modos de Operación
-
-El `core/brain.py` es el componente central que orquesta la respuesta de la IA. Puede operar en tres modos distintos, configurables en `config/settings.json` bajo la clave `brain.mode`.
-
-### Modo `rule_engine` (Por Defecto)
-- **Descripción:** Es el modo más avanzado y recomendado. Utiliza un motor de reglas basado en la librería `Experta` para un razonamiento complejo y contextual.
-- **Fortalezas:** Permite definir comportamientos sofisticados y manejar diálogos de manera más fluida.
-
-### Modo `ml` (Machine Learning)
-- **Descripción:** Utiliza un modelo de clasificación de texto simple (TF-IDF + Regresión Logística con `scikit-learn`) para determinar la intención del usuario y elegir una respuesta.
-- **Fallback:** Si `scikit-learn` no está instalado, el sistema no podrá usar este modo.
-
-### Modo `rule` (Simple)
-- **Descripción:** Un sistema básico de mapeo directo `pregunta -> respuesta`. Es el modo más simple y se utiliza como fallback si los otros modos no están disponibles o no encuentran una respuesta.
-
-### Servidor para Aprendizaje Remoto
-- **Función:** De manera opcional, Mea-Core puede enviar conversaciones a un servidor central para análisis y aprendizaje a mayor escala.
-- **Configuración:** Se controla desde `config/settings.json` -> `remote_learning` -> `enabled`.
-- **Ejecución:** `uvicorn server.main:app --reload`.
-
----
-
-## 🛠️ Herramientas Adicionales
-
-Para crear una copia de seguridad de las bases de datos (`memoria` y `conocimiento`), ejecuta:
-
-```bash
-python tools/backup_db.py
-```
-
----
-
-## 💡 Meta y Contribuciones
-
-La meta final es crear una IA que funcione como "Jarvis para todos".
-
-¡Las contribuciones son bienvenidas! Nuestro pipeline de CI validará tus cambios. No dudes en abrir un Issue, hacer un Fork o contactar por redes a MEA-Technology.
+This software is governed by the terms of the license agreement you entered into with Mea-Core-Enterprise. Refer to the `LICENSE` file for more details.

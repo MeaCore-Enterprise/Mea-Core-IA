@@ -2,9 +2,9 @@ import pytest
 from unittest.mock import MagicMock
 
 # Import components needed for the integration test
-from core.brain import Brain
-from core.memory_store import MemoryStore
-from core.knowledge_base import KnowledgeBase
+from core.cerebro import Brain
+from core.memoria import MemoryStore
+from core.conocimiento import KnowledgeManager
 
 @pytest.fixture
 def integration_test_setup():
@@ -12,64 +12,47 @@ def integration_test_setup():
     Sets up a realistic environment for integration testing.
     It provides a Brain instance with mocked dependencies.
     """
-    # Basic configuration for the test
-    settings = {
-        "brain": {
-            "mode": "rule"  # Start with a simple mode
-        }
-    }
+    settings = {"brain": {"mode": "rule"}}
     responses = {
         "saludos": ["Hola"],
-        "respuestas_especificas": {
-            "pregunta simple": ["respuesta simple"]
-        },
+        "respuestas_especificas": {},
         "plantillas_generales": ["No sé sobre '{input}'"]
     }
 
-    # Mock the dependencies
     mock_memory = MagicMock(spec=MemoryStore)
-    mock_kb = MagicMock(spec=KnowledgeBase)
+    mock_memory.get_memory.return_value = [] # Asegurar que la memoria no interfiera
+    mock_kb = MagicMock(spec=KnowledgeManager)
 
-    # Configure the mock for the knowledge base
-    # When semantic_search is called with any arguments, return a specific list
-    mock_kb.semantic_search.return_value = ["Este es un resultado de la base de conocimiento."]
-    # Make bm25_search return nothing to isolate the semantic search test
-    mock_kb.bm25_search.return_value = []
+    # Configure the mock for the new 'query' method
+    mock_kb.query.return_value = {
+        'direct_facts': ["La arquitectura es modular."],
+        'relations': ["cerebro -> usa -> memoria"]
+    }
 
-
-    # Create the Brain instance with mocked dependencies
     brain = Brain(
         settings=settings,
         responses=responses,
         memory=mock_memory,
-        knowledge_base=mock_kb,
-        swarm_controller=None # Not needed for this test
+        knowledge=mock_kb, # El cerebro espera el argumento 'knowledge'
+        replication_controller=None
     )
 
     return brain, mock_kb, mock_memory
 
 def test_full_flow_with_kb_query(integration_test_setup):
     """
-    Tests a full interaction flow where the Brain needs to consult the Knowledge Base.
+    Tests a full interaction flow where the Brain consults the Knowledge Base.
     """
     brain, mock_kb, mock_memory = integration_test_setup
 
-    # 1. Define a user input that is not a greeting or a specific question
-    user_input = "Háblame sobre la arquitectura del sistema"
+    user_input = "Háblame sobre la arquitectura"
 
-    # 2. Process the message
     response = brain.get_response(user_input)
 
-    # 3. Verify the interaction with the Knowledge Base
-    # Assert that the semantic_search method on the mock_kb was called exactly once
-    mock_kb.semantic_search.assert_called_once_with(user_input.lower(), top_n=2)
+    # Verify that the 'query' method on the mock_kb was called
+    mock_kb.query.assert_called_once_with(user_input.lower())
 
-    # 4. Verify the final response
-    # Check that the response from the mock KB is included in the final output
-    assert "Este es un resultado de la base de conocimiento." in response[1] # The response is formatted, so check for inclusion
-
-# TODO: Add more integration tests:
-# - Test that memory is queried for context.
-# - Test that the rule_engine mode integrates correctly with other components.
-# - Test the flow when a goal is active.
-# - Test the complete flow from a bot (e.g., cli_bot) to the brain and back.
+    # Verify the final response includes data from the mock KB
+    response_text = "\n".join(response)
+    assert "La arquitectura es modular." in response_text
+    assert "cerebro -> usa -> memoria" in response_text

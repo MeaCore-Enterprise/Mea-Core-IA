@@ -12,7 +12,8 @@ import json
 import time
 from typing import List, Dict, Any
 
-from core.memory_store import MemoryStore
+# --- Importación corregida ---
+from core.memoria import MemoryStore
 
 # Se asume que el código fuente está en el directorio padre del directorio 'core'
 SOURCE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,7 +48,8 @@ class ReplicationController:
             available_drives = [f'{d}:\\' for d in string.ascii_uppercase if os.path.exists(f'{d}:\\')]
             # Excluir la unidad del sistema
             system_drive = os.environ.get("SystemDrive", "C:").upper()
-            potential_drives = [d for d in available_drives if d.upper() != f"{system_drive}\"]
+            # --- Sintaxis corregida ---
+            potential_drives = [d for d in available_drives if d.upper() != (system_drive + "\\")]
         # Aquí se añadiría la lógica para Linux y macOS
         return potential_drives
 
@@ -81,9 +83,12 @@ class ReplicationController:
                 json.dump(identity, f, indent=2)
 
             # Registrar la creación del clon en la memoria del padre
-            log_content = f"Replicated to {target_dir} with new ID {identity['id']}"
-            meta = {'type': 'replication', 'clone_id': identity['id'], 'path': target_dir}
-            self.memory.add_memory(log_content, meta=meta, long_term=True)
+            # --- Corregido para usar el nuevo método log_episode ---
+            self.memory.log_episode(
+                type='replication',
+                source='replication_controller',
+                data={'clone_id': identity['id'], 'path': target_dir}
+            )
             
             print(f"[Replicator] ¡Éxito! Mea-Core replicado en {target_dir} con ID: {identity['id']}")
 

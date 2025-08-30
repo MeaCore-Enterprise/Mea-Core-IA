@@ -1,14 +1,16 @@
 import pytest
 from unittest.mock import MagicMock, patch
 
-# Import the class to be tested
-from core.brain import Brain
+# --- Importaciones actualizadas ---
+from core.cerebro import Brain
+from core.memoria import MemoryStore
+from core.conocimiento import KnowledgeManager
+from core.controlador_replicacion import ReplicationController
+from core.objetivos import GoalManager
+# --- Fin de importaciones actualizadas ---
 
-# Mock dependencies if they are complex to set up
-from core.memory_store import MemoryStore
-from core.knowledge_base import KnowledgeBase
-from core.swarm_controller import SwarmController
-from core.goals import GoalManager
+from core.controlador_replicacion import ReplicationController
+from core.objetivos import GoalManager
 
 # Check for optional dependencies
 try:
@@ -46,19 +48,19 @@ def basic_responses():
 
 @pytest.fixture
 def mock_dependencies():
-    """Mocks the external dependencies of the Brain."""
+    """Mocks the new unified dependencies of the Brain."""
     mock_memory = MagicMock(spec=MemoryStore)
-    mock_kb = MagicMock(spec=KnowledgeBase)
-    mock_swarm = MagicMock(spec=SwarmController)
-    
+    mock_knowledge = MagicMock(spec=KnowledgeManager)
+    mock_replication = MagicMock(spec=ReplicationController)
+
     # Mock the return value for search methods to simulate no results
-    mock_kb.bm25_search.return_value = []
-    mock_kb.semantic_search.return_value = []
+    mock_knowledge.query.return_value = {'direct_facts': [], 'relations': []}
+    mock_memory.get_memory.return_value = []
 
     return {
         "memory": mock_memory,
-        "knowledge_base": mock_kb,
-        "swarm_controller": mock_swarm
+        "knowledge": mock_knowledge,
+        "replication_controller": mock_replication
     }
 
 @pytest.fixture
@@ -72,11 +74,11 @@ def brain_instance(basic_settings, basic_responses, mock_dependencies):
     return brain
 
 def test_brain_initialization(brain_instance):
-    """Tests that the Brain initializes correctly."""
+    """Tests that the Brain initializes correctly with new dependencies."""
     assert brain_instance is not None
     assert brain_instance.mode == "rule"
     assert brain_instance.memory is not None
-    assert brain_instance.knowledge_base is not None
+    assert brain_instance.knowledge is not None # Updated from knowledge_base
 
 def test_get_greeting(brain_instance):
     """Tests that a greeting is correctly retrieved."""
@@ -98,33 +100,36 @@ def test_get_response_general_template(brain_instance):
     response = brain_instance.get_response("entrada desconocida")
     assert response == ["No entiendo la entrada: entrada desconocida"]
 
-def test_get_response_from_kb(brain_instance):
-    """Tests that the brain attempts to get a response from the knowledge base."""
+def test_get_response_from_knowledge(brain_instance):
+    """Tests that the brain attempts to get a response from the new KnowledgeManager."""
     # Setup the mock to return a specific result for this test
-    brain_instance.knowledge_base.bm25_search.return_value = ["Resultado de KB"]
+    brain_instance.knowledge.query.return_value = {
+        'direct_facts': ["Hecho de prueba"],
+        'relations': ["Relación de prueba"]
+    }
     
     response = brain_instance.get_response("consulta a la kb")
     
-    # Verify that the search method was called
-    brain_instance.knowledge_base.bm25_search.assert_called_with("consulta a la kb", top_n=3)
+    # Verify that the query method was called
+    brain_instance.knowledge.query.assert_called_with("consulta a la kb")
     
-    # Verify that the response includes the KB result
-    assert "[BM25] Resultados relevantes:" in response
-    assert "- Resultado de KB" in response
+    # Verify that the response includes the knowledge results
+    assert "[Hechos Relevantes]" in response
+    assert "- Hecho de prueba" in response
+    assert "[Relaciones Relevantes]" in response
+    assert "- Relación de prueba" in response
 
 @pytest.mark.skipif(not SKLEARN_AVAILABLE, reason="scikit-learn is not installed")
 def test_ml_mode_initialization(basic_responses, mock_dependencies):
     """Tests that the Brain initializes and trains a model in ML mode."""
     ml_settings = {"brain": {"mode": "ml"}}
-    with patch('core.brain.make_pipeline') as mock_pipeline:
-        # Mock the pipeline and fit method
+    with patch('core.cerebro.make_pipeline') as mock_pipeline:
         mock_model = MagicMock()
         mock_pipeline.return_value = mock_model
 
         brain = Brain(settings=ml_settings, responses=basic_responses, **mock_dependencies)
         
         assert brain.mode == "ml"
-        # Check that the training process was initiated
         assert mock_model.fit.called
         assert brain.model is not None
 
@@ -135,13 +140,4 @@ def test_rule_engine_mode_initialization(basic_responses, mock_dependencies):
     brain = Brain(settings=engine_settings, responses=basic_responses, **mock_dependencies)
     assert brain.mode == "rule_engine"
     assert brain.reasoning_engine is not None
-    # Check if it's an instance of a class that looks like the reasoning engine
     assert hasattr(brain.reasoning_engine, 'get_rules')
-
-# TODO: Add more tests for the following functionalities:
-# - Interaction with GoalManager
-# - Active learning module integration
-# - Memory consolidation (summarization, entity extraction)
-# - Dynamic rule engine interaction (add_rule, list_rules)
-# - Swarm controller interaction
-# - Different scenarios for get_response combining all sources

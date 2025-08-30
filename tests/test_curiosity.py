@@ -1,4 +1,3 @@
-
 import unittest
 import os
 import sys
@@ -6,7 +5,7 @@ import sys
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.curiosity import CuriosityModule
+from core.curiosidad import CuriosityModule
 
 class TestCuriosityModule(unittest.TestCase):
 
@@ -33,6 +32,13 @@ class TestCuriosityModule(unittest.TestCase):
         self.assertIn("estado 1", self.curiosity.known_states)
         self.assertIn("estado 2", self.curiosity.known_states)
         self.assertEqual(len(self.curiosity.known_states), 2)
+
+    def test_explore(self):
+        """Prueba que el método explorar devuelve una acción válida."""
+        possible_actions = ["leer documento", "analizar código", "buscar información"]
+        action = self.curiosity.explore()
+        self.assertIsInstance(action, str)
+        self.assertIn(action, possible_actions)
 
 if __name__ == "__main__":
     unittest.main()
