@@ -1,146 +1,129 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, TextField, Button, Paper, Typography, IconButton, CircularProgress } from '@mui/material';
+import { Box, TextField, IconButton, Paper, List, ListItem, Typography, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import authService from './services/authService'; // Importar el servicio de autenticación
 
+// Definir la estructura de un mensaje
 interface Message {
-  sender: 'user' | 'assistant' | 'system';
+  sender: 'user' | 'bot';
   text: string;
 }
 
-const WEBSOCKET_URL = "ws://localhost:8000/ws/query";
-
-const Chat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: 'assistant', text: 'Hola! Soy MEA-Core. ¿Cómo puedo ayudarte hoy?' },
-  ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isConnecting, setIsConnecting] = useState(true);
-  const ws = useRef<WebSocket | null>(null);
+const Chat: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Conectar al WebSocket
-    ws.current = new WebSocket(WEBSOCKET_URL);
-    setMessages((prev) => [...prev, {sender: 'system', text: 'Conectando al servidor...'}]);
-
-    ws.current.onopen = () => {
-      console.log("WebSocket Connected");
-      setIsConnecting(false);
-      setMessages((prev) => [...prev, {sender: 'system', text: 'Conexión establecida.'}]);
-    };
-
-    ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.responses) {
-        const assistantMessage: Message = { sender: 'assistant', text: data.responses.join('\n') };
-        setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-      } else if (data.error) {
-        const errorMessage: Message = { sender: 'system', text: `Error: ${data.error}` };
-        setMessages((prevMessages) => [...prevMessages, errorMessage]);
-      }
-    };
-
-    ws.current.onerror = (event) => {
-      console.error("WebSocket Error:", event);
-      setMessages((prev) => [...prev, {sender: 'system', text: 'Error de conexión. Asegúrate de que el servidor esté corriendo.'}]);
-    };
-
-    ws.current.onclose = () => {
-      console.log("WebSocket Disconnected");
-      setIsConnecting(false);
-      setMessages((prev) => [...prev, {sender: 'system', text: 'Desconectado del servidor.'}]);
-    };
-
-    // Limpiar la conexión al desmontar el componente
-    return () => {
-      ws.current?.close();
-    };
-  }, []);
-
-  useEffect(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    scrollToBottom()
   }, [messages]);
 
-  const handleSend = () => {
-    if (inputValue.trim() && ws.current && ws.current.readyState === WebSocket.OPEN) {
-      const userMessage: Message = { sender: 'user', text: inputValue };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      
-      // Enviar mensaje al servidor a través de WebSocket
-      ws.current.send(JSON.stringify({ text: inputValue }));
+  const handleSendMessage = async () => {
+    if (input.trim() === '' || isLoading) return;
 
-      setInputValue('');
+    const userMessage: Message = { sender: 'user', text: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    const token = authService.getCurrentUser();
+    if (!token) {
+      const errorMessage: Message = {
+        sender: 'bot',
+        text: 'Error de autenticación. Por favor, inicia sesión de nuevo.',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Añadir el token de autorización
+        },
+        body: JSON.stringify({ text: input }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const botMessage: Message = { 
+        sender: 'bot', 
+        text: data.responses.join('\n')
+      };
+      setMessages(prev => [...prev, botMessage]);
+
+    } catch (error) {
+      const errorMessage: Message = {
+        sender: 'bot',
+        text: 'Error: No se pudo conectar con el núcleo de la IA.',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      handleSend();
+      handleSendMessage();
     }
   };
 
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        bgcolor: 'grey.900', // Fondo más oscuro
-      }}
-    >
+    <Paper elevation={3} sx={{ height: '70vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
       <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
-        {messages.map((msg, index) => (
-          <Box
-            key={index}
-            sx={{
-              display: 'flex',
-              justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              mb: 2,
-            }}
-          >
-            <Paper
-              variant="outlined"
-              sx={{
+        <List>
+          {messages.map((msg, index) => (
+            <ListItem key={index} sx={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+              <Paper elevation={1} sx={{
                 p: 1.5,
-                bgcolor: msg.sender === 'user' ? 'primary.main' : (msg.sender === 'assistant' ? 'grey.800' : 'error.dark'),
-                color: msg.sender === 'user' ? 'primary.contrastText' : 'text.primary',
-                maxWidth: '70%',
-                borderRadius: msg.sender === 'user' ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
-              }}
-            >
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{msg.text}</Typography>
-            </Paper>
-          </Box>
-        ))}
-        {isConnecting && <CircularProgress sx={{ display: 'block', margin: 'auto' }}/>}
-        <div ref={messagesEndRef} />
+                bgcolor: msg.sender === 'user' ? '#007bff' : '#333',
+                color: 'white',
+                maxWidth: '80%',
+              }}>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{msg.text}</Typography>
+              </Paper>
+            </ListItem>
+          ))}
+          {isLoading && (
+            <ListItem sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+               <CircularProgress size={24} />
+            </ListItem>
+          )}
+          <div ref={messagesEndRef} />
+        </List>
       </Box>
-      <Box sx={{ p: 2, bgcolor: 'grey.800' }}>
+      <Box sx={{ p: 2, borderTop: '1px solid #444' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <TextField
             fullWidth
             variant="outlined"
             placeholder="Escribe tu mensaje..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            multiline
-            maxRows={4}
-            disabled={isConnecting || (ws.current && ws.current.readyState !== WebSocket.OPEN)}
+            disabled={isLoading}
+            size="small"
           />
-          <IconButton 
-            color="primary" 
-            onClick={handleSend} 
-            sx={{ ml: 1 }}
-            disabled={isConnecting || (ws.current && ws.current.readyState !== WebSocket.OPEN)}
-          >
+          <IconButton color="primary" onClick={handleSendMessage} disabled={isLoading} sx={{ ml: 1 }}>
             <SendIcon />
           </IconButton>
         </Box>
       </Box>
-    </Box>
+    </Paper>
   );
-};
+}
 
 export default Chat;

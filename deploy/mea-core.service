@@ -1,0 +1,34 @@
+[Unit]
+Description=Mea-Core-Enterprise Service
+After=network.target
+
+[Service]
+# Usuario y grupo que ejecutarán el servicio
+# Cambiar a un usuario sin privilegios por seguridad
+User=mea-user
+Group=mea-group
+
+# Directorio de trabajo de la aplicación
+# Cambiar a la ruta donde se ha clonado el repositorio
+WorkingDirectory=/home/mea-user/Mea-Core
+
+# Comando para iniciar el servicio
+# Asegurarse de que el script de despliegue tenga permisos de ejecución (chmod +x)
+ExecStart=/home/mea-user/Mea-Core/deploy/deploy.sh
+
+# Política de reinicio
+# Reiniciar siempre el servicio si se detiene
+Restart=always
+
+# Tiempo de espera antes de reiniciar
+RestartSec=10
+
+# Redireccionar la salida estándar a syslog
+StandardOutput=syslog
+StandardError=syslog
+
+# Identificador para los logs en syslog
+SyslogIdentifier=mea-core
+
+[Install]
+WantedBy=multi-user.target

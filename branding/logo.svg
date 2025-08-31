@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100">
+  <style>
+    .bg {
+      fill: #0a192f; /* Azul oscuro */
+    }
+    .text-main {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      font-size: 32px;
+      fill: #ffffff; /* Blanco */
+      font-weight: 600;
+    }
+    .text-sub {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      fill: #ffffff; /* Blanco */
+      font-weight: 300;
+      letter-spacing: 1.5px;
+    }
+  </style>
+  <rect class="bg" width="100%" height="100%" rx="5"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-main">Mea-Core</text>
+  <text x="50%" y="75%" dominant-baseline="middle" text-anchor="middle" class="text-sub">E N T E R P R I S E</text>
+</svg>

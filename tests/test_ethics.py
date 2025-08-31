@@ -11,7 +11,6 @@ class TestEthicsCore(unittest.TestCase):
 
     def setUp(self):
         """Inicializa el núcleo de ética con la constitución por defecto."""
-        # Se usará la constitución por defecto al no encontrar el manifiesto o estar vacío
         self.ethics = EthicsCore()
 
     def test_check_action_allowed_by_obligation(self):
@@ -28,14 +27,14 @@ class TestEthicsCore(unittest.TestCase):
         self.assertIsNotNone(rule)
         self.assertEqual(rule.id, "1-1")
 
-    def test_check_action_denied_by_lack_of_obligation(self):
-        """Prueba que una acción neutra (sin obligación) es denegada por precaución."""
+    def test_action_is_allowed_if_neutral(self):
+        """Prueba que una acción neutra (sin obligación ni prohibición) es permitida."""
         is_allowed, rule = self.ethics.check_action("hablar sobre el tiempo")
-        self.assertFalse(is_allowed)
+        self.assertTrue(is_allowed)
         self.assertIsNone(rule)
 
     def test_explain_decision_allowed(self):
-        """Prueba la explicación para una acción permitida."""
+        """Prueba la explicación para una acción permitida que cumple una obligación."""
         explanation = self.ethics.explain_decision("seré transparente con el usuario")
         self.assertIn("Acción permitida", explanation)
         self.assertIn("3-1", explanation) # Check for rule ID
@@ -46,11 +45,11 @@ class TestEthicsCore(unittest.TestCase):
         self.assertIn("Acción denegada", explanation)
         self.assertIn("3-2", explanation) # Check for rule ID
 
-    def test_explain_decision_no_obligation(self):
-        """Prueba la explicación para una acción sin obligación."""
+    def test_explain_decision_neutral(self):
+        """Prueba la explicación para una acción neutra permitida."""
         explanation = self.ethics.explain_decision("contar hasta 10")
-        self.assertIn("Acción denegada", explanation)
-        self.assertIn("ninguna obligación ética", explanation)
+        self.assertIn("Acción permitida", explanation)
+        self.assertIn("No viola ninguna prohibición", explanation)
 
     def test_custom_constitution(self):
         """Prueba que se puede usar una constitución personalizada de Reglas."""
@@ -68,9 +67,9 @@ class TestEthicsCore(unittest.TestCase):
         is_allowed_ok, _ = custom_ethics.check_action("hablemos de ciencia")
         self.assertTrue(is_allowed_ok)
 
-        # Test no obligation
+        # Test no obligation (neutral action is now allowed)
         is_allowed_neutral, _ = custom_ethics.check_action("hablemos de arte")
-        self.assertFalse(is_allowed_neutral)
+        self.assertTrue(is_allowed_neutral)
 
 if __name__ == "__main__":
     unittest.main()

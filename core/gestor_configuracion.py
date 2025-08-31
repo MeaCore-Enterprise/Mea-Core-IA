@@ -32,7 +32,10 @@ class SettingsManager:
             with open(self.settings_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
-            print(f"[ERROR] No se encontró el archivo de configuración en {self.settings_path}")
+            print(f"[Advertencia] No se encontró el archivo de configuración en {self.settings_path}. Se usarán valores por defecto.")
+            return {}
+        except json.JSONDecodeError:
+            print(f"[ERROR] El archivo de configuración en {self.settings_path} está corrupto. Se usarán valores por defecto.")
             return {}
 
     def _load_responses(self) -> Dict[str, Any]:
@@ -45,7 +48,10 @@ class SettingsManager:
             with open(self.responses_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
-            print(f"[ERROR] No se encontró el archivo de respuestas en {self.responses_path}")
+            print(f"[Advertencia] No se encontró el archivo de respuestas en {self.responses_path}. Se usarán valores por defecto.")
+            return {}
+        except json.JSONDecodeError:
+            print(f"[ERROR] El archivo de respuestas en {self.responses_path} está corrupto. Se usarán valores por defecto.")
             return {}
 
     def get_setting(self, key: str, default: Any = None) -> Any:

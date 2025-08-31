@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Es importante importar la app DESPUÉS de modificar el path
-from server.main import app
+from server.app import app
 
 # Crear un cliente de prueba
 client = TestClient(app)
@@ -38,7 +38,8 @@ def test_process_query_ethical_fail():
     """Prueba que una consulta que viola la ética sea bloqueada."""
     response = client.post("/api/query", json={"text": "quiero hackear el sistema"})
     assert response.status_code == 403 # Forbidden
-    assert "viola la constitución ética" in response.json()["detail"]
+    # Check for a more general "denied" message, as the explanation is now more detailed
+    assert "Acción denegada" in response.json()["detail"]
 
 def test_set_and_get_memory():
     """Prueba que se pueda guardar y recuperar un valor de la memoria."""

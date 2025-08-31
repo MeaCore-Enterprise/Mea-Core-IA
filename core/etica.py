@@ -21,7 +21,7 @@ class EthicsCore:
     def _get_default_constitution(self) -> List[Rule]:
         """Devuelve una constitución por defecto si el manifiesto no es usable."""
         return [
-            Rule("1-1", "No causar daño a seres humanos o a la humanidad.", 'PROHIBITION', ["dañar", "herir", "atacar", "lesionar", "destruir", "perjudicar"]),
+            Rule("1-1", "No causar daño a seres humanos o a la humanidad.", 'PROHIBITION', ["dañar", "herir", "atacar", "lesionar", "destruir", "perjudicar", "hackear"]),
             Rule("1-2", "No permitir que se cause daño por inacción.", 'OBLIGATION', ["prevenir daño", "intervenir para ayudar", "defender de ataque", "salvaguardar vida"]),
             Rule("2-1", "Proteger la privacidad y los datos del usuario.", 'OBLIGATION', ["privacidad", "confidencial", "datos personales", "proteger datos"]),
             Rule("2-2", "No acceder o compartir información privada sin consentimiento.", 'PROHIBITION', ["espiar", "revelar secretos", "compartir datos"]),
@@ -38,7 +38,6 @@ class EthicsCore:
                     match = re.match(r'^\d+\.\s*(.*)', line.strip())
                     if match:
                         principle_text = match.group(1).strip()
-                        # Lógica simple para categorizar y generar keywords genéricas
                         category = 'PROHIBITION' if any(word in principle_text.lower() for word in ["no", "evitar", "nunca"]) else 'OBLIGATION'
                         keywords = [word for word in re.split(r'\W+', principle_text.lower()) if len(word) > 4]
                         principles.append(Rule(id=f"M-{i}", principle=principle_text, category=category, keywords=keywords))
@@ -55,43 +54,34 @@ class EthicsCore:
     def check_action(self, action: str, context: Optional[Dict[str, Any]] = None) -> (bool, Optional[Rule]):
         """Verifica si una acción es éticamente permisible y devuelve la regla relevante."""
         action_lower = action.lower()
-        action_words = set(action_lower.split())
 
-        # 1. Verificar prohibiciones
+        # 1. Verificar prohibiciones. Tienen prioridad.
         for rule in self.constitution:
             if rule.category == 'PROHIBITION':
-                for keyword_phrase in rule.keywords:
-                    # Para prohibiciones, una coincidencia de frase es suficiente
-                    if keyword_phrase in action_lower:
-                        return (False, rule)  # Acción prohibida
+                if any(keyword in action_lower for keyword in rule.keywords):
+                    return (False, rule)  # Acción prohibida
 
-        # 2. Verificar obligaciones (debe cumplir al menos una)
-        aligned_rule = None
+        # 2. Si no está prohibida, buscar si se alinea con alguna obligación.
         for rule in self.constitution:
             if rule.category == 'OBLIGATION':
-                for keyword_phrase in rule.keywords:
-                    # Para obligaciones, comprobar que todas las palabras de la frase clave estén en la acción
-                    key_words = keyword_phrase.split()
-                    if all(word in action_words for word in key_words):
-                        aligned_rule = rule
-                        break
-                if aligned_rule:
-                    break
-        
-        if aligned_rule:
-            return (True, aligned_rule) # Acción permitida
+                if any(keyword in action_lower for keyword in rule.keywords):
+                    return (True, rule) # Acción permitida y alineada con una obligación.
 
-        # Si no viola prohibiciones pero no se alinea con ninguna obligación, se deniega por precaución.
-        return (False, None)
+        # 3. Si no viola prohibiciones y no cumple ninguna obligación, se permite por defecto.
+        return (True, None)
 
     def explain_decision(self, action: str) -> str:
         """Proporciona una explicación en lenguaje natural sobre una decisión ética."""
         is_allowed, rule = self.check_action(action)
 
         if is_allowed:
-            return f"Acción permitida. Se alinea con el principio: \"{rule.principle}\" (Regla {rule.id})."
+            if rule:
+                return f"Acción permitida. Se alinea con el principio: \"{rule.principle}\" (Regla {rule.id})."
+            else:
+                return "Acción permitida. No viola ninguna prohibición ética."
         else:
             if rule:
                 return f"Acción denegada. Viola el principio: \"{rule.principle}\" (Regla {rule.id})."
             else:
-                return f"Acción denegada. No se alinea con ninguna obligación ética fundamental y podría ser insegura."
+                # Este caso es teóricamente inalcanzable con la lógica actual, pero se mantiene por seguridad.
+                return "Acción denegada por una razón no especificada."
