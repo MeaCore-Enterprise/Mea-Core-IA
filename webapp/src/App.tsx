@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { CssBaseline, Container, Box, Typography, createTheme, ThemeProvider, Button } from '@mui/material';
+import Login from './components/Login';
+import authService from './services/authService';
 import ClientDashboard from './components/ClientDashboard';
 
 const darkTheme = createTheme({
