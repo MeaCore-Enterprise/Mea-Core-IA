@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the mac_changer script functions from tools.mac_changer
 

@@ -1,57 +1,88 @@
+# tests/test_swarm.py
 
+import asyncio
+import pytest
+import websockets
+from unittest.mock import MagicMock, AsyncMock
 
-import unittest
-from unittest.mock import patch, MagicMock, mock_open
-import os
-import sys
-import json
+from core.swarm import SwarmNode
+from core.gestor_configuracion import GestorConfiguracion
 
-# Añadir el directorio raíz al path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Usar pytest-asyncio para marcar tests asíncronos
+pytestmark = pytest.mark.asyncio
 
-from core.controlador_enjambre import SwarmController
-from core.memoria import MemoryStore
+@pytest.fixture
+def mock_config():
+    """Crea un mock del GestorConfiguracion."""
+    mock = MagicMock(spec=GestorConfiguracion)
+    mock.get_node_id.return_value = "test-node-0"
+    return mock
 
-class TestSwarmController(unittest.TestCase):
+async def test_node_connects_to_peers(mock_config):
+    """Verifica que un nodo intenta conectarse a los peers de su configuración."""
+    peers = ["ws://localhost:8001", "ws://localhost:8002"]
+    mock_config.get_swarm_peers.return_value = peers
+    
+    node = SwarmNode()
+    node.config = mock_config
+    
+    # Mockear la función de conexión de websockets
+    websockets.connect = AsyncMock()
+    
+    await node.connect_to_peers()
+    
+    assert websockets.connect.call_count == 2
+    websockets.connect.assert_any_call(peers[0])
+    websockets.connect.assert_any_call(peers[1])
 
-    def setUp(self):
-        """Configura un entorno de prueba limpio."""
-        self.settings = {
-            "swarm": {
-                "replication_enabled": True,
-                "scan_interval_seconds": 0
-            }
-        }
-        self.memory = MemoryStore()
-        self.swarm = SwarmController(node_id="test_node", db_path=":memory:")
+async def test_broadcast_sends_to_all_connected_peers(mock_config):
+    """Verifica que el broadcast envía un mensaje a todos los peers conectados."""
+    mock_config.get_swarm_peers.return_value = []
+    node = SwarmNode()
+    node.config = mock_config
 
-    @patch('os.name', 'nt')
-    @patch('os.path.exists', return_value=True)
-    @patch('os.environ.get', return_value='C:')
-    def test_get_potential_devices_windows(self, mock_env, mock_exists):
-        """Prueba la detección de dispositivos en un entorno simulado de Windows."""
-        # Llamar al método público que usa internamente la detección de dispositivos
-        with patch.object(self.swarm, 'replicate_to_device') as mock_replicate:
-            self.swarm.run_replication_cycle()
-            # Verificar que se intentó replicar al dispositivo detectado
-            mock_replicate.assert_called_once_with('D:\\')
-        self.assertIn('D:\\', devices)
-        self.assertNotIn('C:\\', devices)
+    # Simular dos peers conectados
+    mock_ws_1 = AsyncMock(spec=websockets.WebSocketClientProtocol)
+    mock_ws_2 = AsyncMock(spec=websockets.WebSocketClientProtocol)
+    node.connected_peers = {
+        "ws://peer1:8000": mock_ws_1,
+        "ws://peer2:8000": mock_ws_2
+    }
 
-    @patch('core.controlador_enjambre.SOURCE_DIR', 'd:\Proyectos\MEA-Core-IA')
-    @patch('os.path.samefile', return_value=False)
-    @patch('os.path.exists', return_value=False)
-    @patch('shutil.copytree')
-    @patch('builtins.open', new_callable=mock_open)
-    def test_replicate_to_device_success(self, mock_open_file, mock_copytree, mock_exists, mock_samefile):
-        """Prueba el flujo de replicación exitoso a un dispositivo."""
-        device_path = 'E:\\'
-        with patch.object(self.memory, 'log_replication') as mock_log_replication:
-            self.swarm.replicate_to_device(device_path)
-            mock_copytree.assert_called_once()
-            mock_open_file.assert_called_with(os.path.join(device_path, "Mea-Core_Clone", "mea_identity.json"), "w")
-            mock_log_replication.assert_called_once()
+    message = {"type": "state_update", "payload": {"status": "testing"}}
+    await node.broadcast(message['type'], message['payload'])
 
-if __name__ == "__main__":
-    unittest.main()
+    # Verificar que se llamó a send() en ambos websockets
+    assert mock_ws_1.send.call_count == 1
+    assert mock_ws_2.send.call_count == 1
 
+async def test_scalability_simulation_10_nodes():
+    """
+    Simula un escenario con 10 nodos para verificar que la lógica de conexión escala.
+    Esto no crea conexiones reales, solo simula la lógica de la aplicación.
+    """
+    num_nodes = 10
+    nodes = []
+    all_peers = [f"ws://node-{i}:8000" for i in range(num_nodes)]
+
+    # Mockear la conexión de websockets para que no falle
+    websockets.connect = AsyncMock()
+
+    for i in range(num_nodes):
+        mock_config = MagicMock(spec=GestorConfiguracion)
+        mock_config.get_node_id.return_value = f"node-{i}"
+        # Cada nodo conoce a todos los demás (excluyéndose a sí mismo)
+        peer_list = [p for p in all_peers if p != f"ws://node-{i}:8000"]
+        mock_config.get_swarm_peers.return_value = peer_list
+        
+        node = SwarmNode()
+        node.config = mock_config
+        nodes.append(node)
+
+    # Simular que todos los nodos intentan conectarse a sus peers
+    connection_tasks = [node.connect_to_peers() for node in nodes]
+    await asyncio.gather(*connection_tasks)
+
+    # Cada uno de los 10 nodos debe intentar conectarse a los otros 9
+    total_connection_attempts = 10 * 9
+    assert websockets.connect.call_count == total_connection_attempts

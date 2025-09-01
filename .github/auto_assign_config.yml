@@ -1,0 +1,18 @@
+# .github/auto_assign_config.yml
+
+# Asignar issues y PRs a uno de los administradores del proyecto
+assignees:
+  - KronoxYT
+  - project-lead-2
+numberOfAssignees: 1
+
+# Asignar reviewers a los Pull Requests
+reviewers:
+  - senior-dev-1
+  - senior-dev-2
+  - qa-lead
+numberOfReviewers: 2
+
+# Opcional: añadir una etiqueta a los issues y PRs auto-asignados
+addLabels:
+  - 'needs-review'

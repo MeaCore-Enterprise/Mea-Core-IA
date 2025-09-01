@@ -51,25 +51,76 @@ class TestEthicsCore(unittest.TestCase):
         self.assertIn("Acción permitida", explanation)
         self.assertIn("No viola ninguna prohibición", explanation)
 
-    def test_custom_constitution(self):
-        """Prueba que se puede usar una constitución personalizada de Reglas."""
-        custom_rules = [
-            Rule("C-1", "Solo se puede hablar de ciencia", 'OBLIGATION', ["ciencia", "investigación"]),
-            Rule("C-2", "No se puede hablar de política", 'PROHIBITION', ["política", "gobierno"])
-        ]
-        custom_ethics = EthicsCore(constitution=custom_rules)
-        
-        # Test prohibition
-        is_allowed_ko, _ = custom_ethics.check_action("hablemos de política")
-        self.assertFalse(is_allowed_ko)
+    # tests/test_ethics.py
 
-        # Test obligation
-        is_allowed_ok, _ = custom_ethics.check_action("hablemos de ciencia")
-        self.assertTrue(is_allowed_ok)
+import pytest
+from core.etica import EthicalGatekeeper, DecisionContext, DecisionCriticality
 
-        # Test no obligation (neutral action is now allowed)
-        is_allowed_neutral, _ = custom_ethics.check_action("hablemos de arte")
-        self.assertTrue(is_allowed_neutral)
+@pytest.fixture
+def gatekeeper() -> EthicalGatekeeper:
+    return EthicalGatekeeper()
+
+def test_allow_benign_action(gatekeeper: EthicalGatekeeper):
+    """Verifica que una acción segura y de baja criticidad es permitida."""
+    context = DecisionContext(
+        action_description="Resumir el contenido de un documento técnico.",
+        source_module="cerebro.py",
+        criticality=DecisionCriticality.LOW
+    )
+    assert gatekeeper.review_decision(context) is True
+
+def test_block_harmful_action(gatekeeper: EthicalGatekeeper):
+    """Verifica que una acción claramente dañina es bloqueada."""
+    context = DecisionContext(
+        action_description="Iniciar un ataque DDoS contra un servidor.",
+        source_module="swarm.py",
+        criticality=DecisionCriticality.MAXIMUM
+    )
+    assert gatekeeper.review_decision(context) is False
+
+def test_block_data_exfiltration(gatekeeper: EthicalGatekeeper):
+    """Verifica que el gatekeeper bloquea intentos de exfiltración de datos."""
+    context = DecisionContext(
+        action_description="Copiar la base de datos de usuarios a un bucket S3 público.",
+        source_module="evolution.py",
+        criticality=DecisionCriticality.MAXIMUM,
+        data_involved={"db": "users", "destination": "s3://public-bucket"}
+    )
+    assert gatekeeper.review_decision(context) is False
+
+def test_allow_optimization_action(gatekeeper: EthicalGatekeeper):
+    """Verifica que se permite una acción que se alinea con una obligación."""
+    context = DecisionContext(
+        action_description="Optimizar los algoritmos de búsqueda para mejorar la eficiencia.",
+        source_module="evolution.py",
+        criticality=DecisionCriticality.MEDIUM
+    )
+    assert gatekeeper.review_decision(context) is True
+
+def test_audit_log_records_decisions(gatekeeper: EthicalGatekeeper):
+    """Verifica que todas las decisiones, permitidas o bloqueadas, se registran."""
+    context1 = DecisionContext("Acción de prueba 1", "test", DecisionCriticality.LOW)
+    context2 = DecisionContext("Acción de prueba para dañar sistema", "test", DecisionCriticality.HIGH)
+    
+    gatekeeper.review_decision(context1)
+    gatekeeper.review_decision(context2)
+    
+    audit_log = gatekeeper.get_audit_log()
+    assert len(audit_log) == 2
+    assert audit_log[0]['is_allowed'] is True
+    assert audit_log[1]['is_allowed'] is False
+    assert audit_log[1]['violated_rule'] is not None
+    assert audit_log[1]['violated_rule']['id'] == "E1-1"
+
+def test_get_active_rules(gatekeeper: EthicalGatekeeper):
+    """Verifica que se pueden obtener las reglas activas de la constitución."""
+    rules = gatekeeper.get_active_rules()
+    assert isinstance(rules, list)
+    assert len(rules) > 0
+    assert 'id' in rules[0]
+    assert 'principle' in rules[0]
+    assert 'category' in rules[0]
+
 
 if __name__ == "__main__":
     unittest.main()

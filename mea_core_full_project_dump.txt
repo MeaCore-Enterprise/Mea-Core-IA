@@ -1,0 +1,849 @@
+MEA-Core-IA/
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── CHECKLIST_FASE2.md
+├── CHECKLIST_FASE3.md
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── Dockerfile
+├── Dockerfile.lite
+├── engine.py
+├── gemini.md
+├── LICENSE
+├── main.py
+├── mea_engine.pth
+├── mea_core_full_project_dump.txt
+├── plan_maestro.md
+├── README_ENTERPRISE.md
+├── README.md
+├── requirements.txt
+├── SECURITY.md
+├── test.py
+├── train.py
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   └── reporte-de-bug.md
+│   └── workflows/
+│       └── ci.yml
+├── bots/
+│   ├── base_bot.py
+│   ├── cli_bot.py
+│   ├── discord_bot.py
+│   ├── telegram_bot.py
+│   └── __pycache__/
+├── branding/
+│   ├── EXPORT_GUIDE.md
+│   ├── logo.svg
+│   └── PRESENTATION.md
+├── clients/
+│   ├── contrato_plantilla.md
+│   ├── onboarding_script.sh
+│   └── beta/
+│       └── propuesta_beta_plantilla.md
+├── config/
+│   ├── responses.json
+│   └── settings.json
+├── core/
+│   ├── analizador.py
+│   ├── cargador.py
+│   ├── cerebro.py
+│   ├── conocimiento.py
+│   ├── consolidador_memoria.py
+│   ├── controlador_enjambre.py
+│   ├── controlador_replicacion.py
+│   ├── curiosity.py
+│   ├── database.py
+│   ├── etica.py
+│   ├── evolucion.py
+│   ├── federated.py
+│   ├── gestor_configuracion.py
+│   ├── goals.py
+│   ├── hardware.py
+│   ├── logger_remoto.py
+│   ├── memoria.py
+│   ├── models.py
+│   ├── motor_reglas.py
+│   ├── multimodal.py
+│   ├── objetivos.py
+│   ├── personalidad.py
+│   ├── plugin_manager.py
+│   ├── red_enjambre.py
+│   ├── schemas.py
+│   ├── security.py
+│   ├── seguridad.py
+│   ├── simulador_enjambre.py
+│   └── swarm.py
+├── data/
+│   ├── central_memory.db
+│   ├── knowledge_base.db
+│   ├── knowledge_graph.gml
+│   ├── mea_core_main.db
+│   ├── mea_memory.db
+│   ├── personality.json
+│   └── swarm_sync.db
+├── deploy/
+│   ├── compose.yml
+│   ├── deploy.sh
+│   ├── mea-core.service
+│   ├── helm/
+│   │   └── mea-core/
+│   │       ├── Chart.yaml
+│   │       ├── templates/
+│   │       │   ├── _helpers.tpl
+│   │       │   ├── service.yaml
+│   │       │   └── statefulset.yaml
+│   │       └── values.yaml
+│   └── k8s/
+│       ├── configmap.yml
+│       ├── deployment.yml
+│       ├── namespace.yml
+│       └── service.yml
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── CHECKLIST.md
+│   ├── CONFIGURACION.md
+│   ├── DEPLOY_CLIENTE.md
+│   ├── ENTERPRISE_ROADMAP.md
+│   ├── FASE4_EXPANSION.md
+│   ├── LANDING_PAGE.md
+│   ├── LICENSING_ENTERPRISE.md
+│   ├── LITE_DEMO_DEPLOY.md
+│   ├── MANIFIESTO_IA.md
+│   ├── PERFORMANCE_BENCHMARKS.md
+│   ├── PITCH_DECK.md
+│   ├── PLUGIN_DEVELOPMENT.md
+│   ├── PRICING_MODEL.md
+│   ├── ROADMAP_TECNICO.md
+│   ├── ROADMAP.md
+│   └── USE_CASES.md
+├── documentos_generados/
+│   ├── historial_desarrollo_inicial.md
+│   ├── reporte_analisis_completo.txt
+│   └── reporte_vision_futura.txt
+├── installer/
+│   ├── install_guide_windows.md
+│   └── install.sh
+├── logs/
+│   └── security/
+│       └── .gitignore
+├── plugins/
+│   ├── __init__.py
+│   ├── logger.py
+│   ├── plugins-index.json
+│   └── system_info.py
+├── server/
+│   ├── app.py
+│   └── main.py
+├── test_mea_core_modelo_lenguaje/
+│   ├── aplicaciones_ia_ml.txt
+│   ├── conceptos_fundamentales_ia_ml.txt
+│   ├── entrenamiento_modelos_ia.txt
+│   ├── etica_gobernanza_ia.txt
+│   ├── herramientas_plataformas_ia_ml.txt
+│   ├── percepcion_mundo_ia_redes_neuronales.txt
+│   ├── sesgos_ia.txt
+│   └── tipos_de_aprendizaje_ia.txt
+├── tests/
+│   ├── conftest.py
+│   ├── test_backup_db.py
+│   ├── test_brain.py
+│   ├── test_cerebro_fallback.py
+│   ├── test_cli_bot.py
+│   ├── test_client_onboarding.py
+│   ├── test_curiosity.py
+│   ├── test_discord_bot.py
+│   ├── test_ethics.py
+│   ├── test_evolution.py
+│   ├── test_goals.py
+│   ├── test_hardware.py
+│   ├── test_import_manifestos.py
+│   ├── test_integration.py
+│   ├── test_knowledge.py
+│   ├── test_loader.py
+│   ├── test_logger.py
+│   ├── test_mac_changer.py
+│   ├── test_memory_persistence.py
+│   ├── test_memory.py
+│   ├── test_parser.py
+│   ├── test_personality.py
+│   ├── test_remote_logger.py
+│   ├── test_scaling.py
+│   ├── test_security_api.py
+│   ├── test_security.py
+│   ├── test_server_api.py
+│   ├── test_settings_manager.py
+│   ├── test_swarm.py
+│   └── test_telegram_bot.py
+├── tools/
+│   ├── backup_db.py
+│   ├── export_to_onnx.py
+│   ├── import_manifestos.py
+│   └── mac_changer.py
+└── webapp/
+    ├── Dockerfile
+    ├── package-lock.json
+    ├── package.json
+    ├── README.md
+    ├── tsconfig.json
+    ├── public/
+    │   ├── favicon.ico
+    │   ├── index.html
+    │   ├── logo192.png
+    │   ├── logo512.png
+    │   ├── manifest.json
+    │   └── robots.txt
+    └── src/
+        ├── App.tsx
+        ├── Chat.tsx
+        ├── index.css
+        ├── index.tsx
+        ├── react-app-env.d.ts
+        ├── components/
+        │   ├── AuditPanel.tsx
+        │   ├── ClientDashboard.tsx
+        │   ├── EthicsPanel.tsx
+        │   ├── GoalsPanel.tsx
+        │   ├── LearningFeed.tsx
+        │   ├── Login.tsx
+        │   └── SwarmMap.tsx
+        └── services/
+            ├── authService.ts
+            └── schemas.ts
+
+
+============================================================
+==           CONTENIDO DE LOS ARCHIVOS DEL PROYECTO           ==
+============================================================
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/.env.example ====================
+
+# Variables de entorno para Mea-Core-Enterprise con Docker Compose
+# Copia este archivo a .env y rellena los valores.
+
+# --- Base de Datos (PostgreSQL) ---
+DB_USER=meacore_user
+DB_PASSWORD=a_strong_and_secret_password
+DB_NAME=meacore_db
+DB_PORT=5432
+
+# --- Seguridad de la API ---
+# IMPORTANTE: Generar una clave segura y compleja para producción.
+# Se puede generar una con: openssl rand -hex 32
+SECRET_KEY=a_very_secret_key_for_development_phase_3
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/.gitattributes ====================
+
+# Auto detect text files and perform LF normalization
+* text=auto
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/.gitignore ====================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#poetry.lock
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#pdm.lock
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/#use-with-ide
+.pdm.toml
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#  and can be added to the global gitignore or merged into this file.  For a more nuclear
+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+#.idea/
+
+# Scripts de arranque locales
+start_api.sh
+start_discord_bot.sh
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/CHECKLIST_FASE2.md ====================
+
+# Checklist Interno - Fase 2: Expansión Visible
+
+Este documento rastrea el estado de avance de las tareas clave para la Fase 2.
+
+## Tareas Principales
+
+- [ ] **Branding:** Crear y aplicar la nueva identidad visual.
+  - [ ] Crear logo en `branding/logo.svg`.
+  - [ ] Aplicar logo al `README.md` principal.
+
+- [ ] **Documentación:** Establecer la visión y el roadmap externo.
+  - [ ] Crear `README_ENTERPRISE.md`.
+  - [ ] Enlazar `README_ENTERPRISE.md` desde el `README.md` principal.
+
+- [ ] **Infraestructura de Despliegue:** Preparar el proyecto para despliegue.
+  - [ ] Crear `Dockerfile` funcional en la raíz.
+  - [ ] Crear script `deploy/deploy.sh`.
+  - [ ] Crear archivo de servicio `deploy/mea-core.service`.
+
+- [ ] **Interfaz Web:** Desarrollar el frontend para interacción.
+  - [ ] Conectar el chat de React al endpoint `/api/query` del backend.
+  - [ ] Añadir sección "Estado del Sistema" (placeholder).
+  - [ ] (Opcional) Integrar Tailwind CSS si es necesario para el diseño.
+
+- [ ] **Verificación:** Probar la nueva infraestructura.
+  - [ ] Construir la imagen de Docker y ejecutar un contenedor localmente.
+  - [ ] Probar el script de despliegue en un entorno de pruebas Linux.
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/CHECKLIST_FASE3.md ====================
+
+# Checklist Interno - Fase 3: Escalamiento y Distribución
+
+Seguimiento de tareas para la conversión de Mea-Core en un producto empresarial escalable y distribuible.
+
+## 1. Backend y Seguridad
+- [ ] **Base de Datos:** Migrar de SQLite a PostgreSQL.
+  - [ ] Abstraer la conexión a la base de datos para soportar tanto PostgreSQL como SQLite.
+  - [ ] Actualizar `core/memoria.py` y `core/conocimiento.py` para usar la nueva capa de abstracción.
+- [ ] **Autenticación:** Implementar sistema de usuarios y JWT.
+  - [ ] Crear modelos de Usuario y Rol en la base de datos.
+  - [ ] Implementar endpoints `/login` y `/register`.
+  - [ ] Proteger endpoints de la API con dependencias de seguridad JWT.
+  - [ ] Añadir pruebas unitarias para el sistema de autenticación.
+- [ ] **HTTPS:** Configurar certificados para desarrollo seguro.
+  - [ ] Generar certificados autofirmados.
+  - [ ] Documentar el uso de certificados reales (Let's Encrypt).
+
+## 2. DevOps e Infraestructura
+- [ ] **Docker Compose:** Orquestar todos los servicios.
+  - [ ] Crear `deploy/compose.yml`.
+  - [ ] Configurar servicio `db` (PostgreSQL) con volumen persistente.
+  - [ ] Configurar servicio `api` (FastAPI).
+  - [ ] Configurar servicio `frontend` (React).
+- [ ] **Verificación:** Probar el despliegue completo.
+  - [ ] Levantar la pila completa con `docker-compose up`.
+  - [ ] Validar la comunicación entre servicios (frontend -> api -> db).
+
+## 3. Distribución y Documentación de Cliente
+- [ ] **Instaladores:** Crear scripts para facilitar la instalación.
+  - [ ] Crear `installer/install.sh` para Linux.
+  - [ ] Crear guía o script `installer/install.bat` para Windows.
+- [ ] **Documentación de Despliegue:** Crear guía para clientes.
+  - [ ] Redactar `docs/DEPLOY_CLIENTE.md`.
+
+## 4. Branding y Producto
+- [ ] **Activos de Marca:** Actualizar la carpeta `branding/`.
+  - [ ] Generar versión PNG del logo.
+  - [ ] Crear plantilla de presentación corporativa en Markdown.
+- [ ] **Marketing:** Crear mockups de documentos de producto.
+  - [ ] Redactar `docs/LANDING_PAGE.md`.
+  - [ ] Redactar `docs/PRICING_MODEL.md`.
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/CODE_OF_CONDUCT.md ====================
+
+# Código de Conducta de Mea-Core
+
+## Nuestro compromiso
+
+Nosotros, como miembros, contribuyentes y líderes del proyecto **Mea-Core**, nos comprometemos a hacer de la participación en nuestra comunidad una experiencia libre de acoso para todos, independientemente de edad, tamaño corporal, discapacidad visible o invisible, etnia, características sexuales, identidad y expresión de género, nivel de experiencia, educación, estatus socioeconómico, nacionalidad, apariencia personal, raza, religión o identidad y orientación sexual.
+
+Además, nos comprometemos a garantizar un **uso ético y seguro de la inteligencia artificial** desarrollada en este proyecto, con especial atención a la privacidad, la transparencia y el respeto de los derechos humanos.
+
+Actuaremos e interactuaremos de manera que fomenten una comunidad abierta, acogedora, diversa, inclusiva, segura y técnicamente responsable.
+
+---
+
+## Nuestros estándares
+
+Ejemplos de comportamiento que contribuyen a un entorno positivo incluyen:
+
+- Demostrar empatía, amabilidad y respeto hacia todas las personas.
+- Ser respetuoso con las diferentes opiniones, puntos de vista y experiencias técnicas.
+- Dar y aceptar comentarios constructivos de forma profesional.
+- Asumir la responsabilidad de nuestros errores, disculpándonos y aprendiendo de la experiencia.
+- Priorizar el bien de la comunidad y la integridad técnica del proyecto por encima de intereses individuales.
+- Desarrollar módulos, plugins y contribuciones libres de malware, spyware, código malicioso o vulnerabilidades intencionales.
+- Asegurar que cualquier código de IA cumpla con los principios de seguridad, privacidad y legalidad.
+
+Ejemplos de comportamiento inaceptable incluyen:
+
+- Uso de lenguaje o imágenes sexualizadas, insinuaciones o acoso sexual.
+- Trolling, insultos, ataques personales o políticos.
+- Acoso público o privado de cualquier tipo.
+- Publicar información privada de otros sin su consentimiento explícito.
+- Incluir en el código intencionalmente puertas traseras, keyloggers, ransomware o cualquier tipo de software malicioso.
+- Ignorar intencionalmente vulnerabilidades de seguridad reportadas.
+- Conductas que razonablemente puedan considerarse inapropiadas en un entorno profesional.
+
+---
+
+## Responsabilidades de cumplimiento
+
+Los líderes del proyecto tienen la responsabilidad de:
+
+- Hacer cumplir los estándares de conducta.
+- Tomar medidas correctivas justas ante cualquier incumplimiento.
+- Eliminar, editar o rechazar contribuciones que no cumplan con este código.
+- Comunicar claramente las razones de cualquier acción disciplinaria.
+
+---
+
+## Alcance
+
+Este Código de Conducta se aplica:
+
+- Dentro de todos los espacios comunitarios (repositorios, foros, canales de chat).
+- Cuando se representa oficialmente a Mea-Core en eventos o plataformas externas.
+
+---
+
+## Aplicación
+
+Para reportar incidentes o vulnerabilidades de seguridad:
+
+📧 **keylertamayo@gmail.com**
+
+Todos los reportes serán revisados de forma rápida, confidencial y justa. La privacidad del denunciante será respetada.
+
+---
+
+## Directrices de aplicación
+
+1. **Corrección**
+   - **Impacto**: Lenguaje inapropiado o comportamiento no profesional.
+   - **Consecuencia**: Advertencia privada y explicación del porqué fue inapropiado. Puede solicitarse disculpa pública.
+
+2. **Advertencia**
+   - **Impacto**: Violación puntual o serie de acciones.
+   - **Consecuencia**: Advertencia formal, restricción temporal de interacciones con la comunidad. Violaciones posteriores pueden derivar en prohibición.
+
+3. **Prohibición temporal**
+   - **Impacto**: Violación grave o comportamiento sostenido inapropiado.
+   - **Consecuencia**: Bloqueo temporal de participación en la comunidad.
+
+4. **Prohibición permanente**
+   - **Impacto**: Reincidencia grave, acoso, inclusión intencional de código malicioso.
+   - **Consequence**: Expulsión permanente de la comunidad y prohibición de contribuciones futuras.
+
+---
+
+## Atribución
+
+Este Código de Conducta está basado en el [Pacto del Colaborador, versión 2.0](https://www.contributor-covenant.org/version/2/0/code_of_conduct.html) y adaptado para los principios de **Mea-Core**.  
+Las Pautas de Impacto Comunitario se inspiraron en la [escalera de aplicación del código de conducta de Mozilla](https://github.com/mozilla/diversity).
+
+---
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/CONTRIBUTING.md ====================
+
+# Guía para contribuir a Mea-Core
+
+Gracias por tu interés en contribuir a **Mea-Core**.  
+Este proyecto busca desarrollar una IA modular, ética y optimizada, con un fuerte compromiso con la seguridad y el rendimiento.
+
+## Cómo contribuir
+1. Haz un fork del repositorio.
+2. Crea una rama para tu función o corrección:
+   ```bash
+   git checkout -b mi-nueva-funcion
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/Dockerfile ====================
+
+# Dockerfile para Mea-Core
+
+# Usar una imagen base de Python
+FROM python:3.10-slim
+
+# Establecer el directorio de trabajo
+WORKDIR /app
+
+# Copiar los archivos de requerimientos e instalarlos
+# Esto se cachea para acelerar builds futuros
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar todo el código de la aplicación
+COPY . .
+
+# Exponer el puerto que usará la API de FastAPI
+EXPOSE 8000
+
+# Comando para ejecutar la aplicación
+# Asume que el punto de entrada es `main.py` que inicia un servidor uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/Dockerfile.lite ====================
+
+# Dockerfile.lite - Para la Demo Pública
+
+# Usar una imagen base de Python más ligera
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Instalar solo las dependencias estrictamente necesarias para la demo
+# No instalamos torch, torchvision, psutil, etc.
+RUN pip install --no-cache-dir fastapi uvicorn python-decouple
+
+# Copiar solo el código necesario para la demo
+# No copiamos el cerebro completo, ni los módulos de evolución, enjambre, etc.
+COPY ./main.py /app/main.py
+COPY ./server/ /app/server/
+COPY ./core/ /app/core/
+COPY ./data/ /app/data/
+COPY ./config/ /app/config/
+
+# Exponer el puerto
+EXPOSE 8000
+
+# Comando para ejecutar la demo
+# Se puede añadir una variable de entorno para activar el modo LITE
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/engine.py ====================
+
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from collections import Counter
+import re
+
+# --- 1. Vocabulario ---
+# Gestiona el mapeo de palabras a IDs numericos y viceversa.
+class Vocabulary:
+    def __init__(self):
+        # Diccionarios para la conversion palabra <-> indice
+        self.word2idx = {"<UNK>": 0} # Token para palabras desconocidas
+        self.idx2word = ["<UNK>"]
+        # Contador para la frecuencia de las palabras
+        self.word_counts = Counter()
+
+    def add_word(self, word):
+        """Añade una palabra al vocabulario (sin crear indice aun)."""
+        self.word_counts[word] += 1
+
+    def build_vocab(self, corpus, min_count=5):
+        """
+        Construye el vocabulario final a partir de un corpus.
+        Filtra palabras que no alcanzan una frecuencia minima (min_count).
+        """
+        # Primero, cuenta todas las palabras del corpus
+        for word in corpus:
+            self.add_word(word)
+
+        # Segundo, asigna indices solo a las palabras que cumplen con min_count
+        for word, count in self.word_counts.items():
+            if count >= min_count:
+                if word not in self.word2idx:
+                    self.idx2word.append(word)
+                    self.word2idx[word] = len(self.idx2word) - 1
+    
+    def get_index(self, word):
+        """Obtiene el indice de una palabra, o el de <UNK> si no existe."""
+        return self.word2idx.get(word, 0)
+
+    def __len__(self):
+        return len(self.idx2word)
+
+# --- 2. Modelo Skip-gram ---
+# La arquitectura de red neuronal para aprender los embeddings.
+class SkipGramModel(nn.Module):
+    def __init__(self, vocab_size, embedding_dim):
+        super(SkipGramModel, self).__init__()
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+
+        # Capa de Embeddings: el corazon del modelo.
+        # Cada fila es el vector de una palabra.
+        self.embeddings = nn.Embedding(vocab_size, embedding_dim)
+
+        # Capa de salida: proyecta el embedding para predecir palabras de contexto.
+        self.output_layer = nn.Linear(embedding_dim, vocab_size)
+
+    def forward(self, target_word_idx):
+        """
+        Paso hacia adelante: toma el indice de la palabra objetivo
+        y predice la probabilidad de cada palabra del vocabulario de ser su contexto.
+        """
+        # Obtiene el vector embedding de la palabra objetivo
+        word_embedding = self.embeddings(target_word_idx)
+        
+        # Calcula los scores para cada palabra del vocabulario
+        scores = self.output_layer(word_embedding)
+        
+        # Devuelve los scores (la funcion de perdida aplicara Softmax)
+        return scores
+
+# --- 3. Motor Principal ---
+# Une el vocabulario y el modelo, y gestiona el guardado/carga.
+class MeaEngine:
+    def __init__(self, embedding_dim=100, min_word_count=5):
+        self.config = {
+            "embedding_dim": embedding_dim,
+            "min_word_count": min_word_count
+        }
+        self.vocab = None
+        self.model = None
+
+    def build(self, text_corpus):
+        """Construye el vocabulario a partir de un corpus de texto."""
+        print("Construyendo vocabulario...")
+        self.vocab = Vocabulary()
+        # Tokenizacion simple: minusculas y division por espacios/puntuacion
+        words = re.findall(r'\b\w+\b', text_corpus.lower())
+        self.vocab.build_vocab(words, self.config["min_word_count"])
+        print(f"Vocabulario construido con {len(self.vocab)} palabras unicas.")
+
+        # Inicializa el modelo con el tamaño del vocabulario
+        self.model = SkipGramModel(
+            vocab_size=len(self.vocab),
+            embedding_dim=self.config["embedding_dim"]
+        )
+
+    def get_trained_embeddings(self):
+        """Devuelve la matriz de embeddings entrenada."""
+        if self.model:
+            # .weight contiene la matriz de embeddings
+            return self.model.embeddings.weight.data
+        return None
+
+    def find_similar_words(self, word, top_n=10):
+        """
+        Encuentra las palabras mas similares a una dada usando similitud de coseno.
+        """
+        if not self.model or not self.vocab:
+            raise Exception("El modelo no ha sido entrenado o cargado.")
+
+        word_idx = self.vocab.get_index(word.lower())
+        if word_idx == 0: # <UNK>
+            print(f"La palabra '{word}' no se encuentra en el vocabulario.")
+            return []
+
+        # Normaliza todos los embeddings para el calculo de similitud de coseno
+        embeddings = self.get_trained_embeddings()
+        embeddings_norm = F.normalize(embeddings, p=2, dim=1)
+        
+        # Obtiene el embedding de la palabra de interes
+        word_vec = embeddings_norm[word_idx]
+
+        # Calcula la similitud de coseno (producto punto con vectores normalizados)
+        cosine_sim = torch.matmul(embeddings_norm, word_vec)
+
+        # Obtiene los indices y scores de las N palabras mas similares
+        # El resultado incluye la propia palabra, por lo que pedimos top_n + 1
+        top_results = torch.topk(cosine_sim, k=top_n + 1)
+
+        similar_words = []
+        for score, idx in zip(top_results.values, top_results.indices):
+            # Omitimos la palabra de entrada
+            if idx.item() != word_idx:
+                similar_words.append((self.vocab.idx2word[idx.item()], score.item()))
+        
+        return similar_words
+
+    def save_model(self, file_path):
+        """Guarda el motor (config, vocabulario, pesos del modelo) en un archivo."""
+        if not self.model or not self.vocab:
+            raise Exception("No hay nada que guardar. Entrena el modelo primero.")
+        
+        model_data = {
+            "config": self.config,
+            "word2idx": self.vocab.word2idx,
+            "idx2word": self.vocab.idx2word,
+            "model_state_dict": self.model.state_dict()
+        }
+        torch.save(model_data, file_path)
+        print(f"Modelo guardado en {file_path}")
+
+    @staticmethod
+    def load_model(file_path):
+        """Carga un motor pre-entrenado desde un archivo."""
+        model_data = torch.load(file_path)
+        
+        # Reconstruye el motor con la configuracion guardada
+        engine = MeaEngine(embedding_dim=model_data["config"]["embedding_dim"])
+        
+        # Reconstruye el vocabulario
+        engine.vocab = Vocabulary()
+        engine.vocab.word2idx = model_data["word2idx"]
+        engine.vocab.idx2word = model_data["idx2word"]
+        
+        # Reconstruye el modelo y carga los pesos
+        engine.model = SkipGramModel(
+            vocab_size=len(engine.vocab),
+            embedding_dim=engine.config["embedding_dim"]
+        )
+        engine.model.load_state_dict(model_data["model_state_dict"])
+        engine.model.eval() # Pone el modelo en modo de evaluacion
+        
+        print(f"Modelo cargado desde {file_path}")
+        return engine
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/gemini.md ====================
+
+## Gemini Added Memories
+- The project's git repository URL is https://github.com/KronoxYT/Mea-Core.git
+- Por favor, comunícate siempre en español.
+--- End of Context from: ../../../.gemini/GEMINI.md ---
+
+
+==================== FILE: /home/paco/Documentos/Proyecto-IA/MEA-Core-IA/LICENSE ====================
+
+Copyright (c) 2025, Mea-Core-Enterprise
+All rights reserved.
+
+This software is the confidential and proprietary information of Mea-Core-Enterprise. 
+You shall not disclose such Confidential Information and shall use it only in 
+accordance with the terms of the license agreement you entered into with Mea-Core-Enterprise.
+

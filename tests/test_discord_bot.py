@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the DiscordBot class from bots.discord_bot
 # from bots.discord_bot import DiscordBot

@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, call, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 import os
 import sys
 

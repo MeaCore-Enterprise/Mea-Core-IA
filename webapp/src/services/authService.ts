@@ -1,11 +1,4 @@
-import { schemas } from '../core'; // Asumiendo que podemos configurar paths para importar
-
-// --- Tipos y Schemas (provisional, idealmente se importan) ---
-type UserCreate = {
-    username: string;
-    email: string;
-    password: string;
-}
+import { UserCreate } from './schemas';
 
 const API_URL = 'http://127.0.0.1:8000';
 

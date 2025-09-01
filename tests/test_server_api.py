@@ -1,7 +1,6 @@
 
 import sys
 import os
-import pytest
 from fastapi.testclient import TestClient
 
 # Añadir el directorio raíz al path para poder importar el módulo del servidor

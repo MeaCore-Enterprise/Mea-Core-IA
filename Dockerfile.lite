@@ -1,0 +1,25 @@
+# Dockerfile.lite - Para la Demo Pública
+
+# Usar una imagen base de Python más ligera
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Instalar solo las dependencias estrictamente necesarias para la demo
+# No instalamos torch, torchvision, psutil, etc.
+RUN pip install --no-cache-dir fastapi uvicorn python-decouple
+
+# Copiar solo el código necesario para la demo
+# No copiamos el cerebro completo, ni los módulos de evolución, enjambre, etc.
+COPY ./main.py /app/main.py
+COPY ./server/ /app/server/
+COPY ./core/ /app/core/
+COPY ./data/ /app/data/
+COPY ./config/ /app/config/
+
+# Exponer el puerto
+EXPOSE 8000
+
+# Comando para ejecutar la demo
+# Se puede añadir una variable de entorno para activar el modo LITE
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

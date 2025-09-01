@@ -1,0 +1,35 @@
+# values.yaml para el chart de mea-core
+
+replicaCount: 3
+
+image:
+  repository: meacore/mea-core-enterprise
+  pullPolicy: IfNotPresent
+  # Sobrescribir la etiqueta de la imagen, por defecto es la appVersion del chart.
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 8000
+
+# Configuración de la aplicación Mea-Core
+config:
+  brain:
+    mode: "rule"
+  swarm:
+    enabled: true
+    # Los peers se descubrirán automáticamente a través del servicio headless de k8s
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""
+
+# Recursos de los pods
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi

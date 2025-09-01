@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the import_manifestos script functions from tools.import_manifestos
 

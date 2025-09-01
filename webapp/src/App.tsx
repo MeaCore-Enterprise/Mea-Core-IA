@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CssBaseline, Container, Box, Typography, createTheme, ThemeProvider, Button } from '@mui/material';
-import Chat from './Chat';
-import Login from './components/Login';
-import authService from './services/authService';
+import ClientDashboard from './components/ClientDashboard';
 
 const darkTheme = createTheme({
   palette: {
@@ -51,32 +49,15 @@ function App() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1">
-            Mea-Core-Enterprise
+            Mea-Core Enterprise
           </Typography>
           <Button variant="outlined" color="primary" onClick={handleLogout}>
             Cerrar Sesión
           </Button>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
-          <Box sx={{ flex: 2 }}>
-            <Chat />
-          </Box>
-          <Box sx={{ flex: 1, bgcolor: 'background.paper', p: 3, borderRadius: 2, height: 'fit-content' }}>
-            <Typography variant="h6" gutterBottom>
-              Estado del Sistema
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              - Núcleo de IA: <span style={{ color: '#64ffda' }}>Operacional</span>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              - API Backend: <span style={{ color: '#64ffda' }}>Activa</span>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              - Conexión al Enjambre: <span style={{ color: '#ff6464' }}>Inactiva</span>
-            </Typography>
-          </Box>
-        </Box>
+        <ClientDashboard />
+
       </Container>
     </ThemeProvider>
   );

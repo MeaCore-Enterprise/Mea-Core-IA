@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the TelegramBot class from bots.telegram_bot
 # from bots.telegram_bot import TelegramBot

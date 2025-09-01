@@ -1,0 +1,27 @@
+# .github/dependabot.yml
+# Configuración básica de Dependabot para mantener las dependencias actualizadas.
+
+version: 2
+updates:
+  # Mantener dependencias para Python (pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Asignar PRs de Dependabot a un líder de proyecto
+    assignees:
+      - "KronoxYT"
+    # Añadir etiqueta para fácil identificación
+    labels:
+      - "dependencies"
+
+  # Mantener dependencias para la WebApp (npm)
+  - package-ecosystem: "npm"
+    directory: "/webapp"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "KronoxYT"
+    labels:
+      - "dependencies"
+      - "frontend"

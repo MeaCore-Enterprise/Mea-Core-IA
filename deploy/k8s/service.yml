@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mea-core-service
+  namespace: mea-core-enterprise
+spec:
+  clusterIP: None # Esto crea un servicio "headless"
+  selector:
+    app: mea-core
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: api-port

@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the RemoteLogger class from core.remote_logger
 # from core.remote_logger import RemoteLogger

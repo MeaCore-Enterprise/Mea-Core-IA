@@ -6,7 +6,7 @@ puede solicitar proactivamente etiquetas para los datos sobre los que tiene
 - más dudas, mejorando así su rendimiento con una mínima intervención humana.
 """
 
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Tuple, Optional
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression

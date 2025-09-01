@@ -3,14 +3,13 @@ import os
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from typing import List
 
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --- Importaciones del Núcleo y de la App ---
 from core import models, schemas, security
-from core.database import SessionLocal, engine, get_db, init_db
+from core.database import SessionLocal, engine, get_db
 from core.gestor_configuracion import SettingsManager
 from core.memoria import MemoryStore
 from core.conocimiento import KnowledgeManager

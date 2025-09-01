@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 from core.cerebro import Brain
 from core.memoria import MemoryStore
 from core.conocimiento import KnowledgeManager
+from core.etica import EthicsCore
 
 @pytest.fixture
 def integration_test_setup():
@@ -22,6 +23,8 @@ def integration_test_setup():
     mock_memory = MagicMock(spec=MemoryStore)
     mock_memory.get_memory.return_value = [] # Asegurar que la memoria no interfiera
     mock_kb = MagicMock(spec=KnowledgeManager)
+    mock_ethics = MagicMock(spec=EthicsCore)
+    mock_ethics.check_action.return_value = (True, None)
 
     # Configure the mock for the new 'query' method
     mock_kb.query.return_value = {
@@ -33,8 +36,8 @@ def integration_test_setup():
         settings=settings,
         responses=responses,
         memory=mock_memory,
-        knowledge=mock_kb, # El cerebro espera el argumento 'knowledge'
-        replication_controller=None
+        knowledge=mock_kb,
+        ethics=mock_ethics
     )
 
     return brain, mock_kb, mock_memory

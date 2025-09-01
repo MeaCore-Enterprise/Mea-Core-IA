@@ -8,7 +8,7 @@ plataforma se centren ónicamente en la interacción con el usuario.
 
 import sys
 import os
-from typing import List, Dict, Any, Optional
+from typing import List
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -32,22 +32,27 @@ class BaseBot:
             node_id (str): Un identificador ónico para la instancia del bot (ej. 'cli', 'discord').
         """
         self.settings_manager = SettingsManager()
+        self.settings = self.settings_manager.settings
         self.responses = self.settings_manager.get_responses()
-        self.memory = MemoryStore(settings_manager=self.settings_manager)
+        
+        # Configuración de la base de datos
+        from core.database import engine, SessionLocal
+        self.db_session = SessionLocal()
+
+        # Instanciación de componentes del núcleo
+        self.memory = MemoryStore()
         self.knowledge_base = KnowledgeManager()
         self.swarm_controller = SwarmController(node_id=node_id)
         self.ethics = EthicsCore()
-        # Instanciar el controlador de replicación por separado
-        self.replication_controller = ReplicationController(settings=self.settings_manager.settings, memory=self.memory)
 
         self.brain = Brain(
-            self.settings_manager.settings,
-            self.responses,
+            settings=self.settings,
+            responses=self.responses,
             memory=self.memory,
-            knowledge=self.knowledge_base, # Corregido el nombre del argumento
-            replication_controller=self.replication_controller # Pasarlo directamente
+            knowledge=self.knowledge_base,
+            ethics=self.ethics
         )
-        self.remote_logger = RemoteLogger(self.settings_manager.settings)
+        self.remote_logger = RemoteLogger(self.settings)
         self.context: List[str] = []
         self.is_running: bool = True
 
@@ -69,7 +74,7 @@ class BaseBot:
             try:
                 _, *value_parts = command.split()
                 log_content = " ".join(value_parts)
-                self.memory.log_episode("manual_log", "command", {"content": log_content})
+                self.memory.log_episode(self.db_session, "manual_log", "command", {"content": log_content})
                 await self.send_message(f"[Memoria] Anotado: '{log_content}'", **kwargs)
             except ValueError:
                 await self.send_message("[Error] Comando !log mal formado.", **kwargs)
@@ -79,7 +84,7 @@ class BaseBot:
             try:
                 _, *query_parts = command.split()
                 query = " ".join(query_parts)
-                results = self.memory.get_memory(query)
+                results = self.memory.get_memory(self.db_session, query)
                 response = f"[Memoria] Resultados para '{query}':\n"
                 if not results:
                     response += "- No se encontraron recuerdos relevantes."
@@ -103,12 +108,13 @@ class BaseBot:
             await self.send_message(f"[Etica] {explanation}", **kwargs)
             return
 
-        responses = self.brain.get_response(message, context=self.context)
+        responses = self.brain.get_response(self.db_session, message, context=self.context)
         for response in responses:
             await self.send_message(response, **kwargs)
 
         # Registrar la conversación como un episodio en la memoria
         self.memory.log_episode(
+            self.db_session,
             type="conversation",
             source="user_interaction",
             data={"user_input": message, "bot_output": responses}

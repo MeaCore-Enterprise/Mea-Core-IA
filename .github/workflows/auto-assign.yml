@@ -1,0 +1,19 @@
+# .github/workflows/auto-assign.yml
+
+name: Auto Assign
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Auto-assign issue'
+        uses: wow-actions/auto-assign@v3
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          config_path: .github/auto_assign_config.yml

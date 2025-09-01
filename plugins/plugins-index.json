@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "plugins": [
+    {
+      "name": "System Information",
+      "module": "system_info",
+      "description": "Proporciona comandos para obtener información del sistema como uso de CPU, RAM y versión del SO.",
+      "author": "Mea-Core Team",
+      "version": "1.0.0",
+      "commands": [
+        {
+          "name": "os_info",
+          "description": "Devuelve información del sistema operativo."
+        },
+        {
+          "name": "cpu_usage",
+          "description": "Devuelve el porcentaje actual de uso de la CPU."
+        },
+        {
+          "name": "memory_info",
+          "description": "Devuelve el estado de la memoria RAM."
+        }
+      ]
+    },
+    {
+      "name": "Weather Forecast",
+      "module": "weather",
+      "description": "(Futuro) Un plugin para obtener el pronóstico del tiempo de una ciudad.",
+      "author": "Community Contributor",
+      "version": "0.1.0",
+      "commands": [
+        {
+          "name": "get_weather",
+          "description": "Obtiene el tiempo para una ciudad específica.",
+          "args": [{"name": "city", "type": "string"}]
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import from core.hardware
 

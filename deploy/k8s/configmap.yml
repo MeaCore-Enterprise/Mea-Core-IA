@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mea-core-config
+  namespace: mea-core-enterprise
+data:
+  # Esta configuración será leída por los nodos de Mea-Core.
+  # Usamos los nombres de servicio de Kubernetes para la comunicación interna del enjambre.
+  settings.json: |-
+    {
+      "brain": {
+        "mode": "rule"
+      },
+      "remote_learning": {
+        "enabled": true,
+        "server_url": "http://mea-core-service:8000/api/learn"
+      },
+      "swarm": {
+        "enabled": true,
+        "peers": [
+          "ws://mea-core-0.mea-core-service:8000",
+          "ws://mea-core-1.mea-core-service:8000",
+          "ws://mea-core-2.mea-core-service:8000"
+        ],
+        "replication_enabled": false,
+        "scan_interval_seconds": 300
+      }
+    }

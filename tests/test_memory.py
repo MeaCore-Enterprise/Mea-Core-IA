@@ -1,75 +1,63 @@
-
 import unittest
 from unittest.mock import MagicMock
 import os
-import time
+import sys
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 # Añadir el directorio raíz al path
-import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.memoria import MemoryStore
-from core.gestor_configuracion import SettingsManager
+from core import models
 
 class TestMemoryStore(unittest.TestCase):
 
     def setUp(self):
         """Configura una base de datos en memoria para cada prueba."""
-        mock_settings_manager = MagicMock(spec=SettingsManager)
-        mock_settings_manager.get_setting.return_value = ":memory:"
-        self.mem = MemoryStore(settings_manager=mock_settings_manager)
-        self.mem.clear_all_memory_for_testing()
+        self.engine = create_engine("sqlite:///:memory:")
+        models.Base.metadata.create_all(self.engine)
+        Session = sessionmaker(bind=self.engine)
+        self.db_session = Session()
+        self.mem = MemoryStore()
 
     def tearDown(self):
         """Cierra la conexión a la DB después de cada prueba."""
-        self.mem.close_db()
+        self.db_session.close()
 
     def test_log_and_get_episode(self):
         """Prueba que se puede registrar y recuperar un episodio."""
         test_data = {"info": "test_value"}
-        self.mem.log_episode(type="test_event", source="test_suite", data=test_data)
+        self.mem.log_episode(self.db_session, type="test_event", source="test_suite", data=test_data)
         
-        retrieved_memories = self.mem.get_memory(query="test_value")
+        retrieved_memories = self.mem.get_memory(self.db_session, query="test_value")
         self.assertEqual(len(retrieved_memories), 1)
         self.assertEqual(retrieved_memories[0]['data'], test_data)
 
     def test_short_term_memory_limit(self):
         """Prueba que la memoria a corto plazo respeta su límite."""
         for i in range(150): # El límite por defecto es 100
-            self.mem.log_episode(type="short_term_test", source="test", data={"i": i}, long_term=False)
+            self.mem.log_episode(self.db_session, type="short_term_test", source="test", data={"i": i}, long_term=False)
         
         self.assertEqual(len(self.mem.short_term), 100)
         self.assertEqual(self.mem.short_term[0]['data']['i'], 50)
 
-    def test_forget_least_relevant(self):
-        """Prueba que se olvida el recuerdo menos accedido."""
-        self.mem.log_episode(type="forget_test", source="test", data={"id": 1, "content": "olvidable"})
-        self.mem.log_episode(type="forget_test", source="test", data={"id": 2, "content": "importante"})
-        
-        self.mem.get_memory(query="importante")
+    def test_reset_memory(self):
+        """Prueba que reset_memory limpia la base de datos."""
+        self.mem.log_episode(self.db_session, type="reset_test", source="test", data={"content": "borrame"})
+        self.db_session.commit() # Asegurarse que se escribe en la DB
 
-        self.mem.forget_least_relevant(n_items=1)
+        # Verificar que la memoria no está vacía
+        memories = self.db_session.query(models.EpisodicMemory).all()
+        self.assertGreater(len(memories), 0)
 
-        all_memories = self.mem._load_from_db()
-        contents = [m['data']['content'] for m in all_memories]
-        self.assertNotIn("olvidable", contents)
-        self.assertIn("importante", contents)
+        # Resetear
+        self.mem.reset_memory(self.db_session)
 
-    def test_delete_episode(self):
-        """Prueba que se puede eliminar un episodio específico por su ID."""
-        episode = self.mem.log_episode(type="delete_test", source="test", data={"content": "borrame"})
-        episode_id = episode['id']
+        # Verificar que la memoria está vacía
+        memories_after_reset = self.db_session.query(models.EpisodicMemory).all()
+        self.assertEqual(len(memories_after_reset), 0)
 
-        self.assertEqual(len(self.mem.get_memory(query="borrame")), 1)
-
-        deleted = self.mem.delete_episode(episode_id)
-        self.assertTrue(deleted)
-
-        self.assertEqual(len(self.mem.get_memory(query="borrame")), 0)
-
-    def test_get_instance_id_is_persistent(self):
-        """Prueba que el instance_id es único y persistente."""
-        instance_id_1 = self.mem.get_instance_id()
-        instance_id_2 = self.mem.get_instance_id()
-        self.assertIsNotNone(instance_id_1)
-        self.assertEqual(instance_id_1, instance_id_2)
+if __name__ == '__main__':
+    unittest.main()

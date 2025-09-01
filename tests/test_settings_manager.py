@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the SettingsManager class from core.settings_manager
 # from core.settings_manager import SettingsManager

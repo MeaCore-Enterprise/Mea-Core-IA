@@ -5,22 +5,19 @@ from unittest.mock import MagicMock, patch
 from core.cerebro import Brain
 from core.memoria import MemoryStore
 from core.conocimiento import KnowledgeManager
-from core.controlador_replicacion import ReplicationController
-from core.objetivos import GoalManager
+from core.etica import EthicsCore
 # --- Fin de importaciones actualizadas ---
 
-from core.controlador_replicacion import ReplicationController
-from core.objetivos import GoalManager
 
 # Check for optional dependencies
 try:
-    from experta import KnowledgeEngine
+    from experta import KnowledgeEngine  # noqa: F401
     EXPERTA_AVAILABLE = True
 except ImportError:
     EXPERTA_AVAILABLE = False
 
 try:
-    from sklearn.linear_model import LogisticRegression
+    from sklearn.linear_model import LogisticRegression  # noqa: F401
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
@@ -51,16 +48,18 @@ def mock_dependencies():
     """Mocks the new unified dependencies of the Brain."""
     mock_memory = MagicMock(spec=MemoryStore)
     mock_knowledge = MagicMock(spec=KnowledgeManager)
-    mock_replication = MagicMock(spec=ReplicationController)
+    mock_ethics = MagicMock(spec=EthicsCore)
 
     # Mock the return value for search methods to simulate no results
     mock_knowledge.query.return_value = {'direct_facts': [], 'relations': []}
     mock_memory.get_memory.return_value = []
+    # Mock the ethics check to always allow actions in tests
+    mock_ethics.check_action.return_value = (True, None)
 
     return {
         "memory": mock_memory,
         "knowledge": mock_knowledge,
-        "replication_controller": mock_replication
+        "ethics": mock_ethics
     }
 
 @pytest.fixture

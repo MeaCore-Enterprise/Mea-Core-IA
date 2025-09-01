@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mea-core
+  namespace: mea-core-enterprise
+
+spec:
+  serviceName: "mea-core-service"
+  replicas: 3 # Número de nodos en el enjambre
+  selector:
+    matchLabels:
+      app: mea-core
+  template:
+    metadata:
+      labels:
+        app: mea-core
+    spec:
+      containers:
+      - name: mea-core-node
+        image: mea-core-enterprise:1.0.0 # La imagen que se construiría
+        # imagePullPolicy: IfNotPresent # Usar imagen local durante el desarrollo
+        ports:
+        - containerPort: 8000
+          name: api-port
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config/settings.json
+          subPath: settings.json
+        - name: data-volume
+          mountPath: /app/data
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mea-core-config
+  # Se necesita un PersistentVolumeClaimTemplate para que cada pod tenga su propio almacenamiento de datos si es necesario
+  volumeClaimTemplates:
+  - metadata:
+      name: data-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi # 1 GB de almacenamiento por nodo

@@ -1,7 +1,4 @@
-import json
-import os
 import random
-import re
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
@@ -10,7 +7,6 @@ from sqlalchemy.orm import Session
 from .memoria import MemoryStore
 from .conocimiento import KnowledgeManager
 from .etica import EthicsCore
-from .motor_reglas import RulesEngine
 from engine import MeaEngine
 
 # --- Dependencias Opcionales ---
@@ -23,7 +19,7 @@ except ImportError:
     SKLEARN_AVAILABLE = False
 
 try:
-    from experta import KnowledgeEngine, Fact, Rule, MATCH, NOT, W
+    from experta import KnowledgeEngine, Fact, Rule, MATCH, NOT, W  # noqa: F401
     EXPERTA_AVAILABLE = True
 except ImportError:
     EXPERTA_AVAILABLE = False

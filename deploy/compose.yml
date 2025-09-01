@@ -1,55 +1,59 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: mea_core_db
-    restart: always
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - "${DB_PORT}:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  api:
-    container_name: mea_core_api
+  # Nodo principal del enjambre
+  mea_core_1:
     build:
       context: ..
       dockerfile: Dockerfile
-    restart: always
-    depends_on:
-      db:
-        condition: service_healthy
+    container_name: mea_core_node_1
     ports:
-      - "8000:8000"
+      - "8001:8000" # Mapea el puerto 8000 del contenedor al 8001 del host
+    volumes:
+      - ../data:/app/data # Persistir los datos
     environment:
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=db  # Usar el nombre del servicio de la DB
-      - DB_PORT=5432 # Puerto interno de Docker
-      - DB_NAME=${DB_NAME}
-      - SECRET_KEY=${SECRET_KEY}
-    command: uvicorn server.main:app --host 0.0.0.0 --port 8000
+      - MEA_NODE_ID=node_1
+      - MEA_SWARM_PEERS=ws://mea_core_2:8000,ws://mea_core_3:8000
+    networks:
+      - mea_swarm_net
 
-  frontend:
-    container_name: mea_core_frontend
+  # Segundo nodo del enjambre
+  mea_core_2:
     build:
-      context: ../webapp
+      context: ..
       dockerfile: Dockerfile
-    restart: always
+    container_name: mea_core_node_2
     ports:
-      - "3000:80" # Mapear el puerto 80 de Nginx al 3000 del host
+      - "8002:8000"
+    volumes:
+      - ../data:/app/data
+    environment:
+      - MEA_NODE_ID=node_2
+      - MEA_SWARM_PEERS=ws://mea_core_1:8000,ws://mea_core_3:8000
     depends_on:
-      - api
+      - mea_core_1
+    networks:
+      - mea_swarm_net
 
-volumes:
-  postgres_data:
-    driver: local
+  # Tercer nodo del enjambre
+  mea_core_3:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: mea_core_node_3
+    ports:
+      - "8003:8000"
+    volumes:
+      - ../data:/app/data
+    environment:
+      - MEA_NODE_ID=node_3
+      - MEA_SWARM_PEERS=ws://mea_core_1:8000,ws://mea_core_2:8000
+    depends_on:
+      - mea_core_1
+      - mea_core_2
+    networks:
+      - mea_swarm_net
+
+networks:
+  mea_swarm_net:
+    driver: bridge

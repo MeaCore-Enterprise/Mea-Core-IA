@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the Logger plugin from plugins.logger
 # from plugins.logger import Logger

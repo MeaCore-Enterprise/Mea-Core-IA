@@ -1,4 +1,3 @@
-import pytest
 
 # TODO: Import the backup_db script functions from tools.backup_db
 

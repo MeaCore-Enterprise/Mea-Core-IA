@@ -1,9 +1,6 @@
 import os
-import re
 import networkx as nx
-import matplotlib.pyplot as plt
-import sys
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Optional, Dict, Any
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError

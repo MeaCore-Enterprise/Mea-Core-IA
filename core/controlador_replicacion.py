@@ -70,7 +70,7 @@ class ReplicationController:
         try:
             # Evitar replicar dentro de un clon existente o del propio proyecto
             if os.path.exists(os.path.join(target_dir, "mea_identity.json")) or os.path.samefile(SOURCE_DIR, target_dir):
-                print(f"[Replicator] El directorio de destino ya es una instancia de Mea-Core. Replicación cancelada.")
+                print("[Replicator] El directorio de destino ya es una instancia de Mea-Core. Replicación cancelada.")
                 return
 
             # Copiar todo el directorio del proyecto

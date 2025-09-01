@@ -22,6 +22,18 @@ class User(Base):
 
     role = relationship("Role")
 
+class APIKey(Base):
+    __tablename__ = "api_keys"
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String, unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    is_active = Column(Boolean, default=True)
+    usage_limit = Column(Integer, nullable=True) # Límite de peticiones (ej. por día)
+    usage_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User")
+
 # --- Modelos de Memoria ---
 
 class EpisodicMemory(Base):
@@ -32,6 +44,7 @@ class EpisodicMemory(Base):
     source = Column(String)
     data = Column(JSON)
     access_count = Column(Integer, default=0)
+    priority = Column(Integer, default=0, index=True)  # 0: normal, >0: mayor prioridad
 
 class KeyValueStore(Base):
     __tablename__ = "kv_store"
