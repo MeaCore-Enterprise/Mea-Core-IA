@@ -1,6 +1,7 @@
 import sys
 import os
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -40,6 +41,22 @@ brain = Brain(
 
 # --- App y Routers ---
 app = FastAPI(title="Mea-Core Enterprise API")
+
+# --- Configuración de CORS ---
+origins = [
+    "http://localhost:3000",  # Para desarrollo local de React
+    "https://app.mea-core.com", # URL de producción del frontend (ejemplo)
+    # Añadir aquí la URL que te de Vercel si es diferente
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"]
+    allow_headers=["*"]
+)
+
 api_router = APIRouter(prefix="/api")
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 

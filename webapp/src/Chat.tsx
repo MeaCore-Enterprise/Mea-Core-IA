@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, TextField, IconButton, Paper, List, ListItem, Typography, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import authService from './services/authService'; // Importar el servicio de autenticación
+import API_URL from './config';
 
 // Definir la estructura de un mensaje
 interface Message {
@@ -43,7 +44,7 @@ const Chat: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/query', {
+      const response = await fetch(`${API_URL}/api/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
