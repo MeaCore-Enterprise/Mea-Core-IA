@@ -5,7 +5,7 @@ python-multipart==0.0.9 # Requerido por FastAPI para los formularios de login
 
 # --- Base de Datos y ORM (Fase 3) ---
 sqlalchemy==2.0.31
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 python-decouple==3.8
 
 # --- Seguridad (Fase 3) ---
