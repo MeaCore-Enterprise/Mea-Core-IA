@@ -27,8 +27,8 @@ const ClientDashboard: React.FC = () => {
           <KeyIcon color="primary" sx={{ mr: 1 }} />
           <Typography variant="h6">Gestión de Licencia</Typography>
         </Box>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={8}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ flexGrow: 1, minWidth: '250px' }}>
             <TextField
               fullWidth
               label="Clave de Licencia"
@@ -36,20 +36,20 @@ const ClientDashboard: React.FC = () => {
               value={licenseKey}
               onChange={(e) => setLicenseKey(e.target.value)}
             />
-          </Grid>
-          <Grid item xs={6} md={2}>
-            <Button fullWidth variant="contained" onClick={handleActivateLicense}>
+          </Box>
+          <Box>
+            <Button fullWidth variant="contained" onClick={handleActivateLicense} sx={{ height: '56px' }}>
               Activar
             </Button>
-          </Grid>
-          <Grid item xs={6} md={2}>
+          </Box>
+          <Box>
             <Chip 
               label={licenseStatus}
               color={licenseStatus === 'Activa' ? 'success' : 'error'}
-              sx={{ width: '100%' }}
+              sx={{ width: '100px', height: '56px' }}
             />
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Paper>
 
       {/* Sección de Estadísticas */}
