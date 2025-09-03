@@ -1,50 +1,60 @@
-# Guía de Despliegue Profesional: Frontend y Backend
+# Guía de Despliegue: Mea-Core Enterprise
 
-Este documento explica cómo desplegar el frontend y el backend de Mea-Core-Enterprise en servicios modernos como Vercel y Render.
+Esta guía detalla los pasos para desplegar el frontend en Vercel y el backend en Render.
 
----
+## 1. Despliegue del Backend (Render)
 
-## 1. Despliegue del Backend (FastAPI)
+El backend utiliza el archivo `deploy/render.yaml` para una configuración automática "Blueprint".
 
-Recomendamos usar **Render** para el backend por su facilidad para desplegar servicios en Docker y gestionar bases de datos.
+1.  **Crear Cuenta en Render:**
+    *   Regístrate o inicia sesión en [render.com](https://render.com).
 
-**Pasos en Render:**
+2.  **Crear un Nuevo Blueprint:**
+    *   En el dashboard, haz clic en **New -> Blueprint**.
+    *   Conecta tu repositorio de GitHub donde se encuentra Mea-Core.
+    *   Render detectará automáticamente el archivo `render.yaml` en la raíz del proyecto. Dale un nombre al grupo de servicios (ej: `mea-core-backend`).
 
-1.  **Crear una Cuenta**: Regístrate en [Render.com](https://render.com/).
-2.  **Nuevo Servicio Web**: En tu dashboard, haz clic en "New" > "Web Service".
-3.  **Conectar Repositorio**: Conecta tu repositorio de GitHub (`Mea-Core-IA`).
-4.  **Configuración del Servicio**:
-    -   **Name**: `mea-core-backend` (o el que prefieras).
-    -   **Environment**: `Docker`.
-    -   **DockerfilePath**: `./Dockerfile.backend` (asegúrate de que apunte al Dockerfile que creamos).
-    -   **Plan**: Elige un plan (el plan gratuito puede ser suficiente para empezar).
-5.  **Variables de Entorno**: Render te permite añadir variables de entorno seguras. El archivo `render.yaml` que hemos creado le sugiere a Render que genere valores seguros automáticamente para `SECRET_KEY` y `MEA_ENCRYPTION_KEY`.
-6.  **Desplegar**: Haz clic en "Create Web Service". Render construirá la imagen y desplegará tu API.
-7.  **Obtener la URL**: Una vez desplegado, Render te dará una URL pública, como `https://mea-core-backend.onrender.com`. **Copia esta URL.**
+3.  **Configuración y Despliegue:**
+    *   Render leerá `render.yaml` y configurará el servicio web usando `Dockerfile.backend`.
+    *   Aprueba el plan. El primer despliegue comenzará automáticamente y puede tardar varios minutos.
 
----
+4.  **Obtener la URL del Backend:**
+    *   Una vez desplegado, Render asignará una URL pública a tu servicio (ej: `https://mea-core-backend.onrender.com`).
+    *   Copia esta URL. La necesitarás para configurar el frontend.
 
-## 2. Despliegue del Frontend (React)
+## 2. Despliegue del Frontend (Vercel)
 
-Recomendamos **Vercel** para el frontend por su integración perfecta con frameworks de JavaScript como React.
+El frontend es una aplicación React que se despliega en Vercel.
 
-**Pasos en Vercel:**
+1.  **Crear Cuenta en Vercel:**
+    *   Regístrate o inicia sesión en [vercel.com](https://vercel.com).
 
-1.  **Crear una Cuenta**: Regístrate en [Vercel.com](https://vercel.com/).
-2.  **Nuevo Proyecto**: En tu dashboard, haz clic en "Add New..." > "Project".
-3.  **Importar Repositorio**: Importa tu repositorio de GitHub (`Mea-Core-IA`).
-4.  **Configuración del Proyecto**:
-    -   **Framework Preset**: Vercel debería detectar `Create React App`.
-    -   **Root Directory**: **MUY IMPORTANTE**. Haz clic en "Edit" y selecciona la carpeta `webapp`.
-5.  **Variables de Entorno**: Aquí es donde conectas el frontend con el backend.
-    -   **KEY**: `REACT_APP_API_URL`
-    -   **VALUE**: Pega la URL de tu backend que copiaste de Render (ej. `https://mea-core-backend.onrender.com`).
-6.  **Desplegar**: Haz clic en "Deploy". Vercel construirá y desplegará tu aplicación de React.
+2.  **Importar Proyecto:**
+    *   Desde el dashboard, haz clic en **Add New -> Project**.
+    *   Importa el repositorio de GitHub de Mea-Core.
+    *   Vercel detectará la configuración en el archivo `vercel.json` que hemos creado.
 
----
+3.  **Configurar Variables de Entorno:**
+    *   En la configuración del proyecto, ve a **Settings -> Environment Variables**.
+    *   Añade la siguiente variable:
+        *   **Key:** `REACT_APP_API_URL`
+        *   **Value:** La URL del backend que obtuviste de Render (ej: `https://mea-core-backend.onrender.com`).
 
-## 3. Verificación Final
+4.  **Desplegar:**
+    *   Haz clic en **Deploy**. Vercel construirá y desplegará la aplicación.
+    *   La URL de acceso principal será del tipo `<project-name>.vercel.app`.
 
-Una vez que ambos servicios estén desplegados, abre la URL de tu frontend (la de Vercel). La aplicación web debería cargar y ser capaz de comunicarse con la API en Render para iniciar sesión y realizar consultas a la IA.
+## 3. Optimización y Extras (Vercel)
 
-¡Felicidades! Tienes un despliegue profesional, seguro y escalable de Mea-Core-Enterprise.
+Una vez desplegado el proyecto, puedes activar funcionalidades adicionales desde el dashboard de Vercel:
+
+*   **Preview Deployments:**
+    *   Esta función está activada por defecto. Cada `pull request` a tu repositorio generará una URL de previsualización aislada y automática.
+
+*   **Speed Insights:**
+    *   Ve a la pestaña **Analytics** o **Speed Insights** en tu proyecto de Vercel.
+    *   Activa el servicio (puede tener un coste asociado o una capa gratuita).
+    *   Desde aquí podrás monitorear el rendimiento de tu aplicación (Core Web Vitals) y obtener recomendaciones de mejora.
+
+*   **Dominios Personalizados:**
+    *   Sigue las instrucciones en `docs/DOMAIN_SETUP.md` para añadir y configurar tu propio dominio.
