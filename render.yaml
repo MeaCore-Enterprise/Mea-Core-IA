@@ -3,7 +3,7 @@
 services:
   - type: web
     name: mea-core-backend
-    env: python
+    env: docker
     plan: free # o 'starter' para más recursos
     dockerfilePath: ./Dockerfile.backend
     healthCheckPath: /
