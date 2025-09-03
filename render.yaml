@@ -12,26 +12,26 @@ services:
         generateValue: true # Render generará un valor aleatorio y seguro
       - key: SECRET_KEY
         generateValue: true # Render generará una clave segura para JWT
-      # - key: DB_USER
-      #   fromDatabase: 
-      #     name: meacore-db
-      #     property: user
-      # - key: DB_PASSWORD
-      #   fromDatabase: 
-      #     name: meacore-db
-      #     property: password
-      # - key: DB_HOST
-      #   fromDatabase: 
-      #     name: meacore-db
-      #     property: host
-      # - key: DB_NAME
-      #   fromDatabase: 
-      #     name: meacore-db
-      #     property: database
+      - key: DB_USER
+        fromDatabase: 
+          name: meacore-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase: 
+          name: meacore-db
+          property: password
+      - key: DB_HOST
+        fromDatabase: 
+          name: meacore-db
+          property: host
+      - key: DB_NAME
+        fromDatabase: 
+          name: meacore-db
+          property: database
 
 # Opcional: Añadir una base de datos PostgreSQL gestionada por Render
-# databases:
-#   - name: meacore-db
-#     databaseName: meacore
-#     user: meacore_user
-#     plan: free
+databases:
+  - name: meacore-db
+    databaseName: meacore
+    user: meacore_user
+    plan: free
