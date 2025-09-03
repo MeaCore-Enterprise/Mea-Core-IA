@@ -17,7 +17,7 @@ experta==1.9.4
 rank-bm25==0.2.2
 scikit-learn==1.7.1
 spacy==3.8.7
-networkx==3.5
+networkx==3.4
 numpy  # Permitir que pip resuelva la versión compatible
 
 # --- Utilidades Generales ---
