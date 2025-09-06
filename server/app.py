@@ -16,6 +16,7 @@ from core.memoria import MemoryStore
 from core.conocimiento import KnowledgeManager
 from core.etica import EthicsCore
 from core.cerebro import Brain
+from server.monitoring import PerformanceMiddleware, get_performance_metrics, check_system_health
 
 # --- Inicialización de la Base de Datos y Componentes ---
 
@@ -53,9 +54,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"]
+    allow_methods=["*"],
     allow_headers=["*"]
 )
+
+# Agregar middleware de monitoreo de rendimiento
+app.add_middleware(PerformanceMiddleware)
 
 api_router = APIRouter(prefix="/api")
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -116,6 +120,16 @@ def read_users_me(current_user: models.User = Depends(get_current_user)):
 def process_query(request: schemas.QueryRequest, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     responses = brain.get_response(db, user_input=request.text)
     return {"responses": responses, "status": f"Consulta procesada para {current_user.username}"}
+
+@api_router.get("/metrics", tags=["Monitoring"])
+def get_metrics():
+    """Endpoint para obtener métricas de rendimiento"""
+    return get_performance_metrics()
+
+@api_router.get("/health", tags=["Monitoring"])
+def health_check():
+    """Endpoint para verificar la salud del sistema"""
+    return check_system_health()
 
 # --- Eventos de Startup y Montaje ---
 
