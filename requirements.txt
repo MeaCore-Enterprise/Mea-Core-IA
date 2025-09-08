@@ -25,7 +25,7 @@ requests==2.32.5
 python-dotenv==1.1.1
 
 # --- Testing ---
-pytest==8.4.1
+pytest==8.4.2
 psutil
 cryptography
 flake8
