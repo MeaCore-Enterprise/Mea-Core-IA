@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.lite
+    container_name: mea-lite-backend
+    environment:
+      - LITE_MODE=true
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - UVICORN_WORKERS=1
+      - PYTHONUNBUFFERED=1
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-change-me-please}
+      - ADMIN_RESET_TOKEN=${ADMIN_RESET_TOKEN:-changeme}
+      - ADMIN_AUTO_RESET=${ADMIN_AUTO_RESET:-true}
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.lite
+    container_name: mea-lite-worker
+    command: ["python","agents/worker.py"]
+    environment:
+      - LITE_MODE=true
+      - REDIS_URL=redis://redis:6379
+      - WORKER_NAME=${HOSTNAME:-worker}
+      - WORKER_CONCURRENCY=1
+    volumes:
+      - ./agents:/app/agents
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: mea-lite-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: mea-lite

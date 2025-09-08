@@ -1,9 +1,10 @@
 import sys
 import os
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 # Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,6 +17,12 @@ from core.memoria import MemoryStore
 from core.conocimiento import KnowledgeManager
 from core.etica import EthicsCore
 from core.cerebro import Brain
+from server.monitoring import PerformanceMiddleware, get_performance_metrics, check_system_health
+import json
+try:
+    import redis
+except Exception:
+    redis = None
 
 # --- Inicialización de la Base de Datos y Componentes ---
 
@@ -53,12 +60,16 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"]
+    allow_methods=["*"],
     allow_headers=["*"]
 )
 
+# Agregar middleware de monitoreo de rendimiento
+app.add_middleware(PerformanceMiddleware)
+
 api_router = APIRouter(prefix="/api")
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
+lan_router = APIRouter(prefix="/lan", tags=["LAN"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
@@ -78,6 +89,47 @@ def create_user(db: Session, user: schemas.UserCreate, role_name: str = 'cliente
     db.refresh(db_user)
     return db_user
 
+def upsert_admin_user(db: Session, username: str, password: str, email: str) -> models.User:
+    """Crea o actualiza el usuario admin con credenciales seguras."""
+    admin_role = db.query(models.Role).filter(models.Role.name == 'admin').first()
+    if not admin_role:
+        # En caso extremo que aún no exista, lo creamos aquí
+        admin_role = models.Role(name='admin')
+        db.add(admin_role)
+        db.commit()
+        db.refresh(admin_role)
+
+    user = db.query(models.User).filter(models.User.username == username).first()
+    hashed_password = security.get_password_hash(password)
+    if user:
+        user.email = email
+        user.hashed_password = hashed_password
+        user.role_id = admin_role.id
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    new_user = models.User(username=username, email=email, hashed_password=hashed_password, role_id=admin_role.id)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+def ensure_admin_seed(db: Session):
+    """Garantiza que exista un admin y permite reset controlado por variables de entorno."""
+    admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+    admin_email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
+    admin_password = os.getenv('ADMIN_PASSWORD')
+    auto_reset = os.getenv('ADMIN_AUTO_RESET', 'false').lower() == 'true'
+
+    if not admin_password:
+        # Evitar bloquear el arranque por falta de password; no tocar usuarios
+        return
+
+    admin_user = db.query(models.User).filter(models.User.username == admin_username).first()
+    if admin_user is None or auto_reset:
+        upsert_admin_user(db, admin_username, admin_password, admin_email)
+
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -91,6 +143,43 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if user is None:
         raise credentials_exception
     return user
+
+# --- Infra de tareas ligeras para hardware bajo ---
+_redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+_redis_client = None
+if redis is not None:
+    try:
+        _redis_client = redis.from_url(_redis_url, decode_responses=False)
+    except Exception:
+        _redis_client = None
+
+
+class EnqueueTaskRequest(BaseModel):
+    id: str
+    text: str
+
+
+@lan_router.post("/enqueue")
+def lan_enqueue_task(req: EnqueueTaskRequest):
+    if not _redis_client:
+        raise HTTPException(status_code=503, detail="Redis no disponible")
+    payload = json.dumps({"id": req.id, "text": req.text}).encode()
+    _redis_client.rpush(os.getenv('TASK_QUEUE', 'mea:tasks'), payload)
+    return {"status": "queued", "id": req.id}
+
+
+@lan_router.get("/results")
+def lan_get_results(limit: int = 10):
+    if not _redis_client:
+        raise HTTPException(status_code=503, detail="Redis no disponible")
+    res_queue = os.getenv('RESULT_QUEUE', 'mea:results')
+    results = []
+    for _ in range(max(1, min(limit, 100))):
+        item = _redis_client.lpop(res_queue)
+        if not item:
+            break
+        results.append(json.loads(item))
+    return {"results": results}
 
 # --- Endpoints ---
 
@@ -117,6 +206,44 @@ def process_query(request: schemas.QueryRequest, db: Session = Depends(get_db), 
     responses = brain.get_response(db, user_input=request.text)
     return {"responses": responses, "status": f"Consulta procesada para {current_user.username}"}
 
+class ResetAdminRequest(BaseModel):
+    new_password: str | None = None
+    username: str | None = None
+    email: str | None = None
+
+@api_router.post("/admin/reset", tags=["Admin"])
+def admin_reset(
+    payload: ResetAdminRequest,
+    db: Session = Depends(get_db),
+    x_admin_reset_token: str | None = Header(default=None, convert_underscores=False)
+):
+    """Resetea o crea el usuario admin.
+
+    Seguridad: requiere header 'X-Admin-Reset-Token' que coincida con ADMIN_RESET_TOKEN.
+    """
+    expected = os.getenv('ADMIN_RESET_TOKEN')
+    if not expected or x_admin_reset_token != expected:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token de reset inválido")
+
+    username = payload.username or os.getenv('ADMIN_USERNAME', 'admin')
+    email = payload.email or os.getenv('ADMIN_EMAIL', 'admin@example.com')
+    password = payload.new_password or os.getenv('ADMIN_PASSWORD')
+    if not password:
+        raise HTTPException(status_code=400, detail="Se requiere 'new_password' o ADMIN_PASSWORD")
+
+    user = upsert_admin_user(db, username=username, password=password, email=email)
+    return {"status": "ok", "message": f"Usuario admin '{user.username}' reseteado"}
+
+@api_router.get("/metrics", tags=["Monitoring"])
+def get_metrics():
+    """Endpoint para obtener métricas de rendimiento"""
+    return get_performance_metrics()
+
+@api_router.get("/health", tags=["Monitoring"])
+def health_check():
+    """Endpoint para verificar la salud del sistema"""
+    return check_system_health()
+
 # --- Eventos de Startup y Montaje ---
 
 @app.on_event("startup")
@@ -131,11 +258,15 @@ def on_startup():
             db.add_all(default_roles)
             db.commit()
             print("[Startup] Roles por defecto creados.")
+
+        # Asegurar admin si falta o si se solicita auto reset via env
+        ensure_admin_seed(db)
     finally:
         db.close()
 
 app.include_router(auth_router)
 app.include_router(api_router)
+app.include_router(lan_router)
 
 @app.get("/", tags=["General"])
 def root():
