@@ -6,8 +6,8 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Instalar solo las dependencias estrictamente necesarias para la demo
-# No instalamos torch, torchvision, psutil, etc.
-RUN pip install --no-cache-dir fastapi uvicorn python-decouple
+# No instalamos torch, torchvision, etc. Añadimos redis para colas livianas
+RUN pip install --no-cache-dir fastapi uvicorn python-decouple redis
 
 # Copiar solo el código necesario para la demo
 # No copiamos el cerebro completo, ni los módulos de evolución, enjambre, etc.

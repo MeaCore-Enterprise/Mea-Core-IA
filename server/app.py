@@ -18,6 +18,11 @@ from core.conocimiento import KnowledgeManager
 from core.etica import EthicsCore
 from core.cerebro import Brain
 from server.monitoring import PerformanceMiddleware, get_performance_metrics, check_system_health
+import json
+try:
+    import redis
+except Exception:
+    redis = None
 
 # --- Inicialización de la Base de Datos y Componentes ---
 
@@ -64,6 +69,7 @@ app.add_middleware(PerformanceMiddleware)
 
 api_router = APIRouter(prefix="/api")
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
+lan_router = APIRouter(prefix="/lan", tags=["LAN"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
@@ -137,6 +143,43 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if user is None:
         raise credentials_exception
     return user
+
+# --- Infra de tareas ligeras para hardware bajo ---
+_redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+_redis_client = None
+if redis is not None:
+    try:
+        _redis_client = redis.from_url(_redis_url, decode_responses=False)
+    except Exception:
+        _redis_client = None
+
+
+class EnqueueTaskRequest(BaseModel):
+    id: str
+    text: str
+
+
+@lan_router.post("/enqueue")
+def lan_enqueue_task(req: EnqueueTaskRequest):
+    if not _redis_client:
+        raise HTTPException(status_code=503, detail="Redis no disponible")
+    payload = json.dumps({"id": req.id, "text": req.text}).encode()
+    _redis_client.rpush(os.getenv('TASK_QUEUE', 'mea:tasks'), payload)
+    return {"status": "queued", "id": req.id}
+
+
+@lan_router.get("/results")
+def lan_get_results(limit: int = 10):
+    if not _redis_client:
+        raise HTTPException(status_code=503, detail="Redis no disponible")
+    res_queue = os.getenv('RESULT_QUEUE', 'mea:results')
+    results = []
+    for _ in range(max(1, min(limit, 100))):
+        item = _redis_client.lpop(res_queue)
+        if not item:
+            break
+        results.append(json.loads(item))
+    return {"results": results}
 
 # --- Endpoints ---
 
@@ -223,6 +266,7 @@ def on_startup():
 
 app.include_router(auth_router)
 app.include_router(api_router)
+app.include_router(lan_router)
 
 @app.get("/", tags=["General"])
 def root():
