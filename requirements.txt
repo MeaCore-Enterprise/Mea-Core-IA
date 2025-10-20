@@ -10,7 +10,7 @@ python-decouple==3.8
 
 # --- Seguridad (Fase 3) ---
 passlib[bcrypt]==1.7.4
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.5.0
 
 # --- Lógica del Núcleo de IA ---
 experta==1.9.4
