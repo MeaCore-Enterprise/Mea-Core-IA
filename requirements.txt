@@ -1,7 +1,7 @@
 # --- Frameworks Principales ---
 fastapi==0.116.1
 uvicorn==0.35.0
-python-multipart==0.0.9 # Requerido por FastAPI para los formularios de login
+python-multipart==0.0.18 # Requerido por FastAPI para los formularios de login
 
 # --- Base de Datos y ORM (Fase 3) ---
 sqlalchemy==2.0.31
