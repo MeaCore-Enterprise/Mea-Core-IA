@@ -1,7 +1,7 @@
 # --- Frameworks Principales ---
 fastapi==0.116.1
 uvicorn==0.35.0
-python-multipart==0.0.18 # Requerido por FastAPI para los formularios de login
+python-multipart==0.0.22 # Requerido por FastAPI para los formularios de login
 
 # --- Base de Datos y ORM (Fase 3) ---
 sqlalchemy==2.0.31
@@ -10,7 +10,7 @@ python-decouple==3.8
 
 # --- Seguridad (Fase 3) ---
 passlib[bcrypt]==1.7.4
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.4.0
 
 # --- Lógica del Núcleo de IA ---
 experta==1.9.4
@@ -21,7 +21,7 @@ networkx==3.4
 numpy  # Permitir que pip resuelva la versión compatible
 
 # --- Utilidades Generales ---
-requests==2.32.5
+requests==2.33.0
 python-dotenv==1.1.1
 
 # --- Testing ---
