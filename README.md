@@ -1,104 +1,47 @@
-# MEA-Core-Enterprise
+# MEA-Core V2 (Arquitectura Distribuida - Swarm AI)
 
-<div align="center">
-  <img src="branding/logo.svg" alt="Mea-Core-Enterprise Logo" width="400"/>
-</div>
+Esta es la recreación desde cero del proyecto MEA-Core con una arquitectura orientada a microservicios/enjambre, diseñada para que múltiples PCs compartan recursos de memoria e inferencia.
 
-**Copyright (c) 2025, Mea-Core-Enterprise. All rights reserved.**
+## Componentes
 
----
+1. **Broker de Mensajes (Redis)**: Actúa como el nodo de conexión rápida en tiempo real.
+2. **Memoria Vectorial (ChromaDB)**: Reemplaza a SQLite para permitir búsqueda semántica rápida de contexto.
+3. **API Gateway (FastAPI)**: El punto de entrada asíncrono para interactuar con el agente.
+4. **Agente (Cerebro)**: Lógica principal preparada para inyectar LLMs locales (como Llama.cpp) y comunicarse con el enjambre.
 
-## 1. Overview
+## Cómo Ejecutar (Simulando un enjambre de 2 PCs)
 
-MEA-Core is a modular artificial intelligence platform designed for local execution, ensuring data privacy and operational independence.
+1. **Iniciar el Broker Redis**
+   (Requiere tener Docker instalado)
+   ```bash
+   docker-compose up -d
+   ```
 
-This software is confidential and proprietary. Unauthorized copying, distribution, or use of this software, or any part thereof, is strictly prohibited.
+2. **Instalar Dependencias**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 2. Project Status
+3. **Arrancar el Nodo 1 (Simulando PC Principal)**
+   En una terminal, ejecuta el servidor en el puerto 8000:
+   ```bash
+   uvicorn api.server:app --port 8000 --reload
+   ```
 
-- **Fase 1: Consolidación Interna ✅ (Completada)**
-- **Fase 2: Expansión Visible ⏳ (En Progreso)**
+4. **Arrancar el Nodo 2 (Simulando PC Secundario)**
+   En OTRA terminal, ejecuta otra instancia en el puerto 8001 (simulando otra máquina en la red LAN que se conecta al mismo cluster Redis):
+   ```bash
+   uvicorn api.server:app --port 8001
+   ```
 
-> Para una visión estratégica detallada, incluyendo el roadmap completo y los objetivos de negocio, por favor consulta nuestro **[README para Enterprise](README_ENTERPRISE.md)**.
+## Pruebas de Funcionamiento de Enjambre
 
-> Para un seguimiento técnico de las tareas, consulta los checklists de cada fase: `docs/CHECKLIST.md` (Fase 1) y `CHECKLIST_FASE2.md` (Fase 2).
-
-## 3. Core Features
-
-- **Local AI Engine:** A language and reasoning engine that provides insights from internal knowledge bases.
-- **Modular and Scalable Architecture:** Built with decoupled components for ethics, memory, knowledge, and reasoning.
-- **Secure, Local-First Operation:** All core processing and data storage are handled locally.
-- **Integrated Knowledge Base:** The system leverages its own knowledge base for reasoning and responses.
-- **Multi-Interface Deployment:** Includes a Command-Line Interface (CLI) and a REST API.
-
-## 4. Ejemplos de Interacción (CLI)
-
-```text
-Usuario > ¿Qué sabes del Proyecto Omega?
-Mea-Core > El Proyecto Omega es un manifiesto orientado a la soberanía digital...
+Puedes enseñarle un concepto o frase a la IA en el **Nodo 1**:
+```bash
+curl -X POST "http://localhost:8000/learn" -H "Content-Type: application/json" -d "{\"text\": \"El código secreto de la base de datos es 12345\"}"
 ```
 
-## 5. Getting Started
-
-### Prerequisites
-
-- Python 3.10 or higher
-- `pip` for package management
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/KronoxYT/Mea-Core.git
-    cd Mea-Core
-    ```
-
-2.  **Create and activate a virtual environment (recommended):**
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    # On Windows, use: .venv\Scripts\activate
-    ```
-
-3.  **Install the required dependencies:**
-    The main script will attempt to do this for you, but you can do it manually:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-## 6. Usage
-
-### Command-Line Interface (CLI)
-
-The primary way to interact with Mea-Core is through the CLI.
-
-1.  **Run the main application:**
-    ```bash
-    python main.py
-    ```
-
-2.  **Available Commands:**
-    -   Type any message to chat with the AI.
-    -   `/reset-memory`: Clears the entire conversation history and knowledge. Requires confirmation.
-    -   `salir` or `quit`: Exits the application.
-
-### API Server
-
-Mea-Core also includes a FastAPI server for programmatic access.
-
-1.  **Run the server:**
-    ```bash
-    uvicorn server.main:app --reload
-    ```
-
-2.  **Access the API documentation:**
-    Once the server is running, you can access the interactive API documentation (Swagger UI) at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
-
-## 7. Disclaimer
-
-> **Este software es experimental, en fase de investigación y desarrollo. Su uso sin autorización puede tener consecuencias legales.**
-
----
-© 2025 Mea-Core-Enterprise. Todos los derechos reservados.  
-Sitio oficial: [próximamente]  
-Contacto: contacto@meacore.ai
+Y luego preguntarle al **Nodo 2**. Debido a que están conectados con Redis (`memory_sync`), el Nodo 2 interceptó el recuerdo que generó el Nodo 1 y lo agregó a su base de datos vectorial local al instante:
+```bash
+curl -X POST "http://localhost:8001/chat" -H "Content-Type: application/json" -d "{\"text\": \"¿Cual es el código secreto?\"}"
+```
