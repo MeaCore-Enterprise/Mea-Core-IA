@@ -7,3 +7,5 @@ chromadb
 httpx
 huggingface-hub
 llama-cpp-python
+python-dotenv
+requests
